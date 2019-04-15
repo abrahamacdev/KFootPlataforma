@@ -1,30 +1,32 @@
 package Utiles
 
-import java.io.File
+import com.andreapivetta.kolor.Color
+import com.andreapivetta.kolor.Kolor
+
 
 object Utils {
 
     /**
-     * Devolvemos la ruta por defecto en la que se buscará la existencia
-     * de plugins.
+     * Logueamos los mensajes pasados por parámetro según el "nivel de debug" necesitado
+     * y el establecido para la sesión actual.
      *
-     * @return String ruta
+     * @param Constantes.DEBUG nivelRequerido: Nivel de debug requerido para mostrar el mensaje
+     * @param String mensaje: Texto a mostrar
+     * @param Color color: Color con el que se mostrará el mensaje
      */
-    fun getDirectorioDefecto(): String{
+    fun debug(nivelRequerido: Constantes.DEBUG, mensaje: String, color: Color = Color.BLACK){
+        // Comprobamos que queremos loguear
+        if (Constantes.DEBUG.DEBUG_LEVEL.value != Constantes.DEBUG.DEBUG_NONE.value){
 
-        val direcPersonal: File = File(System.getProperty("user.home"));
+            // El mensaje es de un test y estamos en el nivel de "Test"
+            if (nivelRequerido.value == Constantes.DEBUG.DEBUG_LEVEL.value && Constantes.DEBUG.DEBUG_LEVEL.value == Constantes.DEBUG.DEBUG_TEST.value){
+                println(Kolor.foreground(mensaje,color))
+            }
 
-        // Recorreemos las carpetas existentes en el directorio personal
-        for (carpeta: File in direcPersonal.listFiles().filter { it.isDirectory }){
-            // Comprobamos que exista una carpeta "Documents||Documentos" bajo
-            // el directorio personal
-            if (carpeta.name.equals("Documents") || carpeta.name.equals("Documentos")){
-                return direcPersonal.name + carpeta.name
+            // Ej: Si el nivel actual es 'Avanzado', todos los de nivel 'Simple' también se mostrarán
+            else if (nivelRequerido.value <= Constantes.DEBUG.DEBUG_LEVEL.value && nivelRequerido.value != Constantes.DEBUG.DEBUG_NONE.value){
+                println(Kolor.foreground(mensaje,color))
             }
         }
-
-        // Por defecto retornaremos el directorio personal
-        return direcPersonal.name
     }
-
 }

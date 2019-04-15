@@ -26,6 +26,15 @@ dependencies {
 
     // Logs con color
     compile "com.andreapivetta.kolor:kolor:0.0.2"
+
+    // JDBC
+    compile "org.xerial:sqlite-jdbc:3.21.0.1"
+
+    // Acceso a SQLite
+    compile 'org.jetbrains.exposed:exposed:0.13.2'
+
+    // Preferencias Simples
+    compile 'com.natpryce:konfig:1.6.10.0'
 }
 
 compileKotlin {
