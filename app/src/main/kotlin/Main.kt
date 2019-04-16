@@ -26,4 +26,8 @@ fun main(args: Array<String>){
     // Realizamos las comprobaciones iniciales del programa
     Setup.realizarComprobaciones(args)
 
+    // Comprobamos los plugins existentes y los ejecutamos
+    val hay = Office().hayPluginsValidos()
+    println(hay)
+
 }
