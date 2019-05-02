@@ -103,11 +103,12 @@ class Supervisor {
         return false
     }
 
+    // TODO Falta ejecutar los plugins
     /**
      *
      */
     fun lanzarPlugins(){
-
+        
     }
 
 }
