@@ -1,9 +1,14 @@
 package Controlador
 
+import com.kscrap.libreria.Modelo.Dominio.Inmueble
+import io.reactivex.processors.PublishProcessor
+import kotlinx.coroutines.Deferred
+
 class Supervisor {
 
     private val plugins: ArrayList<Plugin> = ArrayList()
     private var estaEjecutando: Boolean = false
+    private val coroutinaPlugin: HashMap<Plugin, Deferred<Any>> = HashMap()
 
     companion object {
 
@@ -69,6 +74,8 @@ class Supervisor {
     fun eliminarPlugin(indice: Int): Boolean{
 
         if (!estaEjecutando){
+
+            // Comprobamos que el índice solicitado sea válido
             if (indice >= 0 && indice < plugins.size){
                 plugins.removeAt(indice)
                 return true
@@ -109,6 +116,14 @@ class Supervisor {
      */
     fun lanzarPlugins(){
 
-    }
+        // Bloqueamos la modificación de los plugins existentes
+        estaEjecutando = true
 
+        plugins.forEach { plugin ->
+
+            val obj = plugin.clasePrincipal.newInstance()                                           // Creamos una instancia de la clase
+            val funcionCargado = plugin.metodoCargado.invoke(obj) as PublishProcessor<Inmueble>     // Llamamos al método de cargado del plugin
+
+        }
+    }
 }
