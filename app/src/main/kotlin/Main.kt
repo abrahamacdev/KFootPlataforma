@@ -1,17 +1,5 @@
-import Controlador.Excepciones.ComandoException
 import Controlador.Office
 import Controlador.Setup
-import Modelo.Preferencias.Propiedades
-import Utiles.Constantes
-import com.natpryce.konfig.Key
-import com.natpryce.konfig.booleanType
-import com.natpryce.konfig.stringType
-import io.reactivex.Observable
-import io.reactivex.Observer
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.toObservable
-import java.io.File
-import kotlin.collections.ArrayList
 
 /**
  * Desde aquí lanzaremos el "Office" u "Oficina" desde la que se cargaŕan
@@ -27,7 +15,10 @@ fun main(args: Array<String>){
     Setup.realizarComprobaciones(args)
 
     // Comprobamos los plugins existentes y los ejecutamos
-    val hay = Office().hayPluginsValidos()
-    println(hay)
+    val office = Office.getInstancia()
+    if(office.hayPluginsValidos()){
 
+        office.cargarPlugins()
+        office.ejecutarPlugins()
+    }
 }

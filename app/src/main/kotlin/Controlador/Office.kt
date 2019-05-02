@@ -1,84 +1,140 @@
 package Controlador
 
 import Utiles.Constantes
+import com.kscrap.libreria.Modelo.Dominio.Inmueble
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
+import io.reactivex.processors.PublishProcessor
 import io.reactivex.rxkotlin.toObservable
 import java.io.File
+import java.lang.reflect.Method
 import java.net.URL
 import java.net.URLClassLoader
+import java.util.jar.JarEntry
 import java.util.jar.JarFile
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
+/**
+ * Esta clase se encarga de toddo lo relacionado con los plugins
+ * de la plataforma KScrap. Desde aquí cargaremos en memoria los
+ * diferentes plugins y los ejecutaremos para comenzar el proceso de
+ * obtención de datos
+ * @version 1.0
+ * @author Abraham
+ */
 class Office{
+
+    // Lista de plugins que se ejecutarán posteriormente
+    private var plugins: ArrayList<Plugin> = ArrayList()
+
+    companion object {
+
+        // Lista de métodos que podrá tener un plugin para ser ejecutado
+        private val METODOS_EJECUCION: HashMap<String,String> = HashMap(mapOf("obtenerOfertas" to Void.TYPE.canonicalName))
+
+        // Lista de métodos que tendrá que tener un plugin para ser cargado
+        private val METODOS_CARGADO: HashMap<String,String> = HashMap(mapOf("obtenerComunicador" to "${PublishProcessor.create<Inmueble>().javaClass.canonicalName}<${Inmueble().javaClass.canonicalName}>"))
+
+        private var instancia: Office? = null;
+
+        @Synchronized
+        fun getInstancia(): Office{
+
+            if (instancia == null){
+                instancia = Office()
+            }
+
+            return instancia!!
+        }
+    }
+
+    private constructor()
 
     /**
      * Comprobamos si hay plugins válidos en el directorio de plugins
-     * establecido
+     * establecido.
      *
      * @return Boolean: Si se ha encontrado al menos 1 plugin válido
      */
     fun hayPluginsValidos(): Boolean{
 
-        val observable: Observable<File>? = obtenerJarsDirPlugins()
+        val jarsObservable: Observable<File>? = obtenerJarsDirPlugins()
+
+        var hayPlugins = false
 
         // Hay archivos .jar
-        if (observable != null){
-
-            var hayPlugins = false
+        if (jarsObservable != null){
 
             val observer = object : Observer<File> {
 
+                private lateinit var subcripcion: Disposable;
+
                 override fun onComplete() {}
 
-                override fun onSubscribe(d: Disposable) {}
+                override fun onSubscribe(d: Disposable) {
+                    this.subcripcion = d
+                }
 
                 override fun onNext(jar: File) {
 
-                    JarFile(jar.absolutePath).stream()
+                    // Recorremos cada uno de los elementos del jar
+                    val claseValida = JarFile(jar.absolutePath).stream()
+                            .filter{
+                                comprobarClaseValida(it)
+                            }
+                            .findFirst()
 
-                            // Comprobamos que el plugin/jar cumpla los patrones necesarios
-                            // En caso afirmativo, se llamará a #onComplete()
-                            .forEach {componente ->
+                    // Si hay una clase válida, comprobamos que tenga los métodos necesarios
+                    if (claseValida.isPresent){
 
-                                // Comprobamos si hay una clase "Main" en la raíz del .jar
-                                if (componente.name.matches(Regex("^[Mm]ain\\w*\\.class$"))){
+                        // Cargamos el archivo .jar
+                        val urlClassLoader: URLClassLoader = URLClassLoader.newInstance(arrayOf(URL("jar:file:${jar.absolutePath}!/")))
 
-                                    // Cargamos el archivo .jar
-                                    val urlClassLoader: URLClassLoader = URLClassLoader.newInstance(arrayOf(URL("jar:file:${jar.absolutePath}!/")))
+                        // Cargamos la clase del .jar
+                        val plugin = urlClassLoader.loadClass(claseValida.get().name.split(".")[0])
 
-                                    // Cargamos la clase "Main" del .jar
-                                    val plugin = urlClassLoader.loadClass(componente.name.split(".")[0])
-
-                                    // TODO: Hay que comprobar que el tipo de dato de vuelta sea un "ConjuntoInmuebles"
-                                    // Recorremos los métodos de la clase
-                                    val cuenta = plugin.methods.forEach{metodo ->
-
-                                        // TODO Revisar el nombre del método
-                                        // Comprobamos que el nombre del método sea el necesario
-                                        if (metodo.name.equals("obtenerOfertas")){
-                                            hayPlugins = true
-                                            onComplete()
-                                        }
+                        var cargadoValido = false
+                        var ejecucionValida = false
+                        // Comprobamos que tenga alguno de los métodos de ejecución
+                        // y cargado neceasarios
+                        val esValida = plugin.declaredMethods
+                                .filter{
+                                    if (comprobarMetodoCargadoValido(it)){
+                                        cargadoValido = true
                                     }
 
-                                }
-                            }
+                                    if (comprobarMetodoEjecucionValido(it)){
+                                        ejecucionValida = true
+                                    }
 
+                                    cargadoValido && ejecucionValida
+                                }
+                                .firstOrNull()
+
+                        // Comprobamos que la clase halla pasado los
+                        // filtros necesarios
+                        if (esValida != null){
+                            hayPlugins = true
+
+                            // Evitamos seguir comprobando jars
+                            if (!this.subcripcion.isDisposed){
+                                this.subcripcion.dispose()
+                            }
+                        }
+                    }
                 }
 
                 override fun onError(e: Throwable) { throw e }
             }
 
             // Recorremos cada uno de los .jar
-            observable.subscribe(observer)
+            jarsObservable.subscribe(observer)
             observer.onComplete()
-
-            return hayPlugins
-
         }
 
-        return false
+        return hayPlugins
     }
 
     /**
@@ -86,7 +142,7 @@ class Office{
      *
      * @return Observable<File>?: Observable con los archivos que son .jar
      */
-    fun obtenerJarsDirPlugins(): Observable<File>?{
+    private fun obtenerJarsDirPlugins(): Observable<File>?{
 
         // Observable con todoo el contenido de un directorio
         val archivos: Observable<File> = File(Constantes.DIRECTORIO_PLUGINS).listFiles().toObservable()
@@ -100,7 +156,7 @@ class Office{
                     jars.add(it)
                 }
 
-        // Si '.jar's devolveremos el observable
+        // Si hay '.jar's devolveremos el observable
         if (jars.size >= 0){
             return jars.toObservable()
         }
@@ -108,6 +164,166 @@ class Office{
         return null
     }
 
+    /**
+     * Cargamos todos los plugins válidos en memoria
+     * para su posterior ejecución
+     */
+    fun cargarPlugins(){
 
+        val observableJars = obtenerJarsDirPlugins()
+
+        // Comprobamos que halla jars
+        if (observableJars != null){
+
+
+            val observer = object : Observer<File> {
+                override fun onComplete() {}
+
+                override fun onSubscribe(d: Disposable) {}
+
+                override fun onNext(jar: File) {
+
+                    // Recorremos cada uno de los elementos del jar
+                    val claseValida = JarFile(jar.absolutePath).stream()
+                            .filter{
+                                comprobarClaseValida(it)
+                            }
+                            .findFirst()
+
+                    // Si hay una clase válida, comprobamos que tenga los métodos necesarios
+                    if (claseValida.isPresent){
+
+                        // Cargamos el archivo .jar
+                        val urlClassLoader: URLClassLoader = URLClassLoader.newInstance(arrayOf(URL("jar:file:${jar.absolutePath}!/")))
+
+                        // Cargamos la primera clase válida que halla en el jar
+                        val clase = urlClassLoader.loadClass(claseValida.get().name.split(".")[0])
+
+                        val metodoCargado = buscarPrimerMetodoCargado(clase)
+                        val metodoEjecucion = buscarPrimerMetodoEjecucion(clase)
+
+                        // Hay métodos válidos en la clase
+                        if (metodoCargado != null && metodoEjecucion != null){
+                            val plugin = Plugin(jar,metodoEjecucion, metodoCargado, clase)
+                            plugins.add(plugin)
+                        }
+                    }
+                }
+
+                override fun onError(e: Throwable) {
+                    e.printStackTrace()
+                }
+            }
+
+            observableJars.subscribe(observer)
+            observer.onComplete()
+
+        }
+    }
+
+    /**
+     * Pasamos la lista de plugins al supervisor
+     * y le pedimos que los ejecute
+     */
+    fun ejecutarPlugins(){
+
+        with(Supervisor.getInstancia()){
+            anadirListaPlugin(plugins)
+            lanzarPlugins()
+        }
+    }
+
+    /**
+     * Comprobamos que el componente del jar sea una clase válida
+     *
+     * @param componente: ELemento del jar a revisar
+     *
+     * @return Boolean: SI la clase es válida
+     */
+    private fun comprobarClaseValida(componente: JarEntry): Boolean{
+
+        val reg = Regex("^[Mm]ain.class$")
+        val enRaiz = componente.name.indexOf(47.toChar()) == -1
+
+        return componente.name.matches(reg) && enRaiz
+    }
+
+    /**
+     * Comprobamos el método de cargado existente
+     * en el plugin
+     *
+     * @param clazz: Clase en la que buscaremos los métodos de cargado
+     *
+     * @return Method?: Método de cargado existente en la clase
+     */
+    private fun buscarPrimerMetodoCargado(clazz: Class<*>): Method? {
+
+        for(metodo in clazz.declaredMethods){
+            if (comprobarMetodoCargadoValido(metodo)){
+                return metodo
+            }
+        }
+        return null
+    }
+
+    /**
+     * Comprobamos si el método pasado por parámetro es válido para la etapa
+     * de cargado del plugin
+     *
+     * @param metodo: Método a revisar
+     *
+     * @return Si el método es válido
+     */
+    private fun comprobarMetodoCargadoValido(metodo: Method): Boolean{
+
+        if (METODOS_CARGADO.containsKey(metodo.name)){
+
+            val value = METODOS_CARGADO.get(metodo.name)
+
+            if (value != null && value.equals(metodo.genericReturnType.typeName)){
+                return true
+            }
+        }
+        return false
+    }
+
+    /**
+     * Comprobamos el método de ejecucion existente
+     * en el plugin
+     *
+     * @param clazz: Clase en la que buscaremos los métodos de ejecución
+     *
+     * @return Method?: Método de cargado existente en la clase
+     */
+    private fun buscarPrimerMetodoEjecucion(clazz: Class<*>): Method? {
+
+        for(metodo in clazz.declaredMethods){
+            if (comprobarMetodoEjecucionValido(metodo)){
+                return metodo
+            }
+        }
+        return null
+    }
+
+    /**
+     * Comprobamos si el método pasado por parámetro es válido para la etapa
+     * de ejecución del plugin
+     *
+     * @param metodo: Método a revisar
+     *
+     * @return Si el método es válido
+     */
+    private fun comprobarMetodoEjecucionValido(metodo: Method): Boolean{
+
+        if (METODOS_EJECUCION.containsKey(metodo.name)){
+
+            val value = METODOS_EJECUCION.get(metodo.name)
+
+            if (value != null && value.equals(metodo.genericReturnType.typeName)){
+                return true
+            }
+        }
+        return false
+    }
 
 }

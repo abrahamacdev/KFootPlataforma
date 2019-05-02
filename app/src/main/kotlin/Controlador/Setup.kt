@@ -1,7 +1,7 @@
 package Controlador
 
 import Controlador.Excepciones.ComandoException
-import Modelo.Preferencias.Propiedades
+import Modelo.PropiedadesService
 import Utiles.Constantes
 import Utiles.Utils
 import com.andreapivetta.kolor.Color
@@ -11,8 +11,6 @@ import com.natpryce.konfig.stringType
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.toObservable
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.lang.Exception
 
@@ -28,7 +26,7 @@ object Setup {
 
         // Creamos el documentos con las propiedades del programa
         // si no existe, sino lo cargaremos en memoria
-        Propiedades.getPropiedades()
+        PropiedadesService.getPropiedades()
 
         // Aplicamos los argumentos pasados por parámetros
         if (args.size > 0){
@@ -58,12 +56,12 @@ object Setup {
         if (esPrimeraVez()){
 
             // Comprobamos si no hay ninguna ruta del directorio de plugins establecida
-            if (Propiedades.getPropiedades().getOrNull(Key(Constantes.RUTA_PLUGINS_KEY, stringType)) == null && Constantes.DIRECTORIO_PLUGINS == null){
+            if (PropiedadesService.getPropiedades().getOrNull(Key(Constantes.RUTA_PLUGINS_KEY, stringType)) == null && Constantes.DIRECTORIO_PLUGINS == null){
                 crearDirectorioPorDefecto()
             }
 
             // Primera ejecución del programa realizada
-            Propiedades.add(Constantes.PRIMERA_VEZ_KEY, true)
+            PropiedadesService.add(Constantes.PRIMERA_VEZ_KEY, true)
         }
 
 
@@ -113,7 +111,7 @@ object Setup {
      * @return Boolean: Si ya lo  hemos ejecutado anteriormente
      */
     private fun esPrimeraVez(): Boolean{
-        val propiedades = Propiedades.getPropiedades()
+        val propiedades = PropiedadesService.getPropiedades()
         val primeraVez = Key("YaEjecutado", booleanType)
 
         // Es la primera vez que lo ejecutamos
@@ -138,7 +136,7 @@ object Setup {
             directorioPlugins.mkdir()
 
             // Si se ha creado el directorio, lo guardamos en el archivo de configuración
-            Propiedades.add(Constantes.RUTA_PLUGINS_KEY, Constantes.DIRECTORIO_DOCUMENTOS + Constantes.NOMBRE_DIRECTORIO_PLUGINS)
+            PropiedadesService.add(Constantes.RUTA_PLUGINS_KEY, Constantes.DIRECTORIO_DOCUMENTOS + Constantes.NOMBRE_DIRECTORIO_PLUGINS)
 
             // Guardamos la ruta del directorio en memoria
             Constantes.DIRECTORIO_PLUGINS = Constantes.DIRECTORIO_DOCUMENTOS + Constantes.NOMBRE_DIRECTORIO_PLUGINS
@@ -219,7 +217,7 @@ object Setup {
                         val key = Key(Constantes.RUTA_PLUGINS_KEY, stringType)
 
                         // Actualizamos la ruta en la que buscaremos los plugins en el archivo de confiruación
-                        Propiedades.modify(key,f.absolutePath, true)
+                        PropiedadesService.modify(key,f.absolutePath, true)
                         Constantes.DIRECTORIO_PLUGINS = f.absolutePath
 
                         return

@@ -1,6 +1,6 @@
 package Utiles
 
-import Modelo.Preferencias.Propiedades
+import Modelo.PropiedadesService
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.stringType
 import java.io.File
@@ -27,7 +27,7 @@ object Constantes {
     val NOMBRE_DIRECTORIO_PLUGINS = "/KScrapPlugins"
 
     // Directorio por defecto en el que se buscarán plugins
-    var DIRECTORIO_PLUGINS = Propiedades.getPropiedades().getOrNull(Key(RUTA_PLUGINS_KEY, stringType))
+    var DIRECTORIO_PLUGINS = PropiedadesService.getPropiedades().getOrNull(Key(RUTA_PLUGINS_KEY, stringType))
 
     // Directorio personal del usuario
     val DIRECTORIO_PERSONAL = System.getProperty("user.home")
