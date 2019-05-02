@@ -108,7 +108,7 @@ class Supervisor {
      *
      */
     fun lanzarPlugins(){
-        
+
     }
 
 }
