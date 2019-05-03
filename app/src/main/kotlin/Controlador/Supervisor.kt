@@ -1,8 +1,13 @@
 package Controlador
 
-import com.kscrap.libreria.Modelo.Dominio.Inmueble
-import io.reactivex.processors.PublishProcessor
+import com.kscrap.libreria.Controlador.Transmisor
 import kotlinx.coroutines.Deferred
+import com.kscrap.libreria.Modelo.Dominio.Inmueble
+import io.reactivex.Observer
+import io.reactivex.disposables.Disposable
+import io.reactivex.processors.PublishProcessor
+import org.reactivestreams.Subscriber
+import org.reactivestreams.Subscription
 
 class Supervisor {
 
@@ -112,7 +117,9 @@ class Supervisor {
 
     // TODO Falta ejecutar los plugins
     /**
-     *
+     * Desde aquí ejecutaremos todos los plugins
+     * válido que hallan sido encontrados en el directorio
+     * de plugins establecido
      */
     fun lanzarPlugins(){
 
@@ -121,8 +128,24 @@ class Supervisor {
 
         plugins.forEach { plugin ->
 
-            val obj = plugin.clasePrincipal.newInstance()                                           // Creamos una instancia de la clase
-            val funcionCargado = plugin.metodoCargado.invoke(obj) as PublishProcessor<Inmueble>     // Llamamos al método de cargado del plugin
+            val obj = plugin.clasePrincipal.newInstance()                                   // Creamos una instancia de la clase
+            val transmisor = plugin.metodoCargado.invoke(obj) as Transmisor<Inmueble>       // Llamamos al método de cargado del plugin
+
+            transmisor.subscribe(object : Subscriber<Inmueble> {
+                override fun onComplete() {}
+
+                override fun onSubscribe(s: Subscription?) {
+                    s!!.request(1)
+                }
+
+                override fun onNext(t: Inmueble?) {
+                    println(t.toString())
+                }
+
+                override fun onError(t: Throwable?) {}
+            })
+
+            plugin.metodoEjecucion.invoke(obj)
 
         }
     }

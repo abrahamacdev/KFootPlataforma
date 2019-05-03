@@ -3,7 +3,6 @@ package Utiles
 import com.andreapivetta.kolor.Color
 import com.andreapivetta.kolor.Kolor
 
-
 object Utils {
 
     /**

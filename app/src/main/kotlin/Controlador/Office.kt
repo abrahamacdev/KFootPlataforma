@@ -1,6 +1,7 @@
 package Controlador
 
 import Utiles.Constantes
+import com.kscrap.libreria.Controlador.Transmisor
 import com.kscrap.libreria.Modelo.Dominio.Inmueble
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -35,7 +36,7 @@ class Office{
         private val METODOS_EJECUCION: HashMap<String,String> = HashMap(mapOf("obtenerOfertas" to Void.TYPE.canonicalName))
 
         // Lista de métodos que tendrá que tener un plugin para ser cargado
-        private val METODOS_CARGADO: HashMap<String,String> = HashMap(mapOf("obtenerComunicador" to "${PublishProcessor.create<Inmueble>().javaClass.canonicalName}<${Inmueble().javaClass.canonicalName}>"))
+        private val METODOS_CARGADO: HashMap<String,String> = HashMap(mapOf("obtenerTransmisor" to "${Transmisor.crear<Inmueble>().javaClass.canonicalName}<${Inmueble().javaClass.canonicalName}>"))
 
         private var instancia: Office? = null;
 
@@ -204,7 +205,7 @@ class Office{
 
                         // Hay métodos válidos en la clase
                         if (metodoCargado != null && metodoEjecucion != null){
-                            val plugin = Plugin(jar,metodoEjecucion, metodoCargado, clase)
+                            val plugin = Plugin(jar, metodoCargado, metodoEjecucion, clase)
                             plugins.add(plugin)
                         }
                     }
