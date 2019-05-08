@@ -1,21 +1,22 @@
-package Controlador
+package Modelo
 
+import Utiles.plus
 import java.io.File
 import java.lang.reflect.Method
+import java.util.concurrent.atomic.AtomicLong
 
 class Plugin (val jarFile: File, val metodoCargado: Method, val metodoEjecucion: Method, val clasePrincipal: Class<*>, val nombrePlugin: String = "Desconocido"){
 
     init {
-
-        Plugin.Companion.ID += 1
+        Companion.ID += 1
     }
 
-    val ID: Long = Plugin.Companion.ID
+    val ID: AtomicLong = Companion.ID
 
     companion object {
 
         // Nos servirá para identificar a cada plugin unequívocamente
-        private var ID: Long = 0
+        private var ID: AtomicLong = AtomicLong(0)
     }
 
     override fun equals(o: Any?): Boolean {

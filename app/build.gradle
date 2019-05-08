@@ -37,7 +37,9 @@ dependencies {
     // Preferencias Simples
     compile 'com.natpryce:konfig:1.6.10.0'
 
-    compile files('libs/KScrapLibreria-1.0.jar')
+    // Librería KScrap
+    compile fileTree(dir: 'libs/KScrapLib/', include: '*.jar')
+    
 }
 
 compileKotlin {

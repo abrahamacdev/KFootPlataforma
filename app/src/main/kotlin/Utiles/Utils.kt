@@ -2,6 +2,7 @@ package Utiles
 
 import com.andreapivetta.kolor.Color
 import com.andreapivetta.kolor.Kolor
+import java.util.concurrent.atomic.AtomicLong
 
 object Utils {
 
@@ -29,3 +30,7 @@ object Utils {
         }
     }
 }
+
+// Permite la suma de dos números atómicos
+operator fun AtomicLong.plus (otro: AtomicLong): AtomicLong = AtomicLong(this.get() + otro.get())
+operator fun AtomicLong.plus (otro: Long): AtomicLong = AtomicLong(this.get() + AtomicLong(otro).get())

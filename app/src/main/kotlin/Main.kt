@@ -16,9 +16,11 @@ fun main(args: Array<String>){
 
     // Comprobamos los plugins existentes y los ejecutamos
     val office = Office.getInstancia()
+
     if(office.hayPluginsValidos()){
 
-        office.cargarPlugins()
-        office.ejecutarPlugins()
+        office.cargarPlugins()      // Cargamos en memoria los plugins
+
+        office.ejecutarPlugins()    // Ejecutamos los plugins cargados
     }
 }

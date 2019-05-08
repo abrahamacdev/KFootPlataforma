@@ -1,12 +1,12 @@
 package Controlador
 
+import Modelo.Plugin
 import Utiles.Constantes
 import com.kscrap.libreria.Controlador.Transmisor
 import com.kscrap.libreria.Modelo.Dominio.Inmueble
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
-import io.reactivex.processors.PublishProcessor
 import io.reactivex.rxkotlin.toObservable
 import java.io.File
 import java.lang.reflect.Method
@@ -36,7 +36,7 @@ class Office{
         private val METODOS_EJECUCION: HashMap<String,String> = HashMap(mapOf("obtenerOfertas" to Void.TYPE.canonicalName))
 
         // Lista de métodos que tendrá que tener un plugin para ser cargado
-        private val METODOS_CARGADO: HashMap<String,String> = HashMap(mapOf("obtenerTransmisor" to "${Transmisor.crear<Inmueble>().javaClass.canonicalName}<${Inmueble().javaClass.canonicalName}>"))
+        private val METODOS_CARGADO: HashMap<String,String> = HashMap(mapOf("obtenerTransmisor" to Transmisor.crear<Inmueble>().javaClass.canonicalName))
 
         private var instancia: Office? = null;
 
@@ -102,7 +102,7 @@ class Office{
                         // y cargado neceasarios
                         val esValida = plugin.declaredMethods
                                 .filter{
-                                    if (comprobarMetodoCargadoValido(it)){
+                                    if (comprobarMetodoCargadoValido(it,plugin)){
                                         cargadoValido = true
                                     }
 
@@ -205,6 +205,7 @@ class Office{
 
                         // Hay métodos válidos en la clase
                         if (metodoCargado != null && metodoEjecucion != null){
+
                             val plugin = Plugin(jar, metodoCargado, metodoEjecucion, clase)
                             plugins.add(plugin)
                         }
@@ -260,7 +261,7 @@ class Office{
     private fun buscarPrimerMetodoCargado(clazz: Class<*>): Method? {
 
         for(metodo in clazz.declaredMethods){
-            if (comprobarMetodoCargadoValido(metodo)){
+            if (comprobarMetodoCargadoValido(metodo, clazz)){
                 return metodo
             }
         }
@@ -272,17 +273,39 @@ class Office{
      * de cargado del plugin
      *
      * @param metodo: Método a revisar
+     * @param clasePrincipal: Clase principal que contiene el método de cargado
      *
      * @return Si el método es válido
      */
-    private fun comprobarMetodoCargadoValido(metodo: Method): Boolean{
+    private fun comprobarMetodoCargadoValido(metodo: Method, clasePrincipal: Class<*>): Boolean{
 
+        // Comprobamos que el nombre del método sea válido
         if (METODOS_CARGADO.containsKey(metodo.name)){
 
-            val value = METODOS_CARGADO.get(metodo.name)
+            val value = METODOS_CARGADO.get(metodo.name) ?: ""
 
-            if (value != null && value.equals(metodo.genericReturnType.typeName)){
-                return true
+            var clase = clasePrincipal.newInstance()
+            val retornoMetodo = metodo.returnType
+
+            when {
+
+                // El método de cargado del plugin es mediante
+                // un {[Transmisor]}
+                metodo.name.equals("obtenerTransmisor") && retornoMetodo.name.equals(value)-> {
+
+                    // Obtenemos el transmisor
+                    var transmisor = clasePrincipal.getDeclaredMethod("obtenerTransmisor").invoke(clase)
+                    var classTransmisor = transmisor.javaClass
+
+                    // Obtenemos el tipo de dato que almacena el transmisor
+                    var tipoRetorno = classTransmisor.getDeclaredMethod("getTipoTransmisor").invoke(transmisor) as Class<*>
+
+                    // Si el tipo de dato extiende de {[Inmueble]}, será válido
+                    if (tipoRetorno.superclass.canonicalName.equals(Inmueble().javaClass.canonicalName)){
+
+                        return true
+                    }
+                }
             }
         }
         return false
