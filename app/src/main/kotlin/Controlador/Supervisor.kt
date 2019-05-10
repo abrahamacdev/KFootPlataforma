@@ -1,11 +1,7 @@
 package Controlador
 
 import Modelo.Plugin
-import com.kscrap.libreria.Controlador.Transmisor
-import kotlinx.coroutines.Deferred
-import com.kscrap.libreria.Modelo.Dominio.Inmueble
-import org.reactivestreams.Subscriber
-import org.reactivestreams.Subscription
+import kotlinx.coroutines.*
 
 class Supervisor {
 
@@ -15,6 +11,7 @@ class Supervisor {
 
     companion object {
 
+        @Volatile
         private var instancia: Supervisor? = null;
 
         @Synchronized
@@ -113,7 +110,6 @@ class Supervisor {
         return false
     }
 
-    // TODO Falta ejecutar los plugins
     /**
      * Desde aquí ejecutaremos todos los plugins
      * válidos que hallan sido encontrados en el directorio
@@ -126,23 +122,18 @@ class Supervisor {
 
         plugins.forEach { plugin ->
 
-            val obj = plugin.clasePrincipal.newInstance()                                   // Creamos una instancia de la clase
-            val transmisor = plugin.metodoCargado.invoke(obj) as Transmisor<Inmueble>       // Llamamos al método de cargado del plugin
-
-            transmisor.subscribirse(object : Subscriber<Inmueble> {
-                override fun onComplete() {}
-
-                override fun onSubscribe(s: Subscription?) {
-                    s!!.request(1)
-                }
-
-                override fun onNext(t: Inmueble?) {}
-
-                override fun onError(t: Throwable?) {}
-            })
-
-            plugin.metodoEjecucion.invoke(obj)
+            plugin.activar()
 
         }
+    }
+
+    /**
+     * Comprobamos si los plugins han terminado
+     * de scrapear los datos
+     *
+     * @return Boolean si han terminado todos o no
+     */
+    fun pluginsFinalizados(): Boolean{
+        return plugins.all { it.haTerminado() }
     }
 }

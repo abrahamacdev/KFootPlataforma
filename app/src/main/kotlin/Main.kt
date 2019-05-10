@@ -1,5 +1,7 @@
 import Controlador.Office
 import Controlador.Setup
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
 /**
  * Desde aquí lanzaremos el "Office" u "Oficina" desde la que se cargaŕan
@@ -23,4 +25,11 @@ fun main(args: Array<String>){
 
         office.ejecutarPlugins()    // Ejecutamos los plugins cargados
     }
+
+    while (!office.haTerminado()){
+        runBlocking {
+            delay(1000)
+        }
+    }
+
 }

@@ -236,6 +236,18 @@ class Office{
     }
 
     /**
+     * Comprobamos que se hallan terminado
+     * de ejecutar los plugins por completo
+     *
+     * @see {[Supervisor.pluginsFinalizados]]}
+     *
+     * @return Boolean si se ha terminado la ejecución o no
+     */
+    fun haTerminado(): Boolean{
+        return Supervisor.getInstancia().pluginsFinalizados()
+    }
+
+    /**
      * Comprobamos que el componente del jar sea una clase válida
      *
      * @param componente: ELemento del jar a revisar
