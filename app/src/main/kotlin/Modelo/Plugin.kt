@@ -6,10 +6,10 @@ import com.kscrap.libreria.Modelo.Dominio.Inmueble
 import com.kscrap.libreria.Modelo.Repositorio.ConfiguracionRepositorioInmueble
 import com.kscrap.libreria.Modelo.Repositorio.RepositorioInmueble
 import com.kscrap.libreria.Utiles.Constantes
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Deferred
+import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import org.reactivestreams.Subscriber
 import org.reactivestreams.Subscription
 import java.io.File
@@ -17,16 +17,26 @@ import java.lang.reflect.Method
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
-class Plugin (val jarFile: File, val metodoCargado: Method, val metodoEjecucion: Method, val clasePrincipal: Class<*>, val nombrePlugin: String = "Desconocido"){
+/**
+ * Esta clase recoge todos los datos necesarios para poder lanzar un plugin.
+ * Cada vez que se vaya a ejecutar un plugin, se creara un nuevo objeto de este tipo
+ * que contenta entre otras cosas:
+ * @param jarFile: Archivo jar con el codigo del plugin a ejecutar
+ * @param metodoCargado: Este metodo de cargado se utilizara para obtener algun objeto que nos permita pasar informacion del plugin a la plataforma
+ * @param metodoEjecucion: Este metodo se llamara para comenzar la ejecucion del plugin
+ * @param clasePrincipal: Clase que contiene el metodo de cargado y ejecucion del plugin
+ * @param nombrePlugin: Nombre del plugin
+ */
+class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion: Method, val clasePrincipal: Class<*>, val nombrePlugin: String = "Desconocido"){
 
     // Instancia de la clase principal del plugin
     private val obj = this.clasePrincipal.newInstance()
 
-    // Transmisor que utiliza el plugin
+    // Transmisor que utiliza el plugin para transmitir la informacion
     private var transmisor: Transmisor<Inmueble>? = null
 
-    // DataFrame que contiene la información que se va scrapeando
-    private val dataframe = crearDataframe()
+    // RepositorioInmueble en el que iremos guardando los datos que se scrapeen
+    private val repositorioInmueble = crearRepositorioInmuebles()
 
     // Nos servirá para conocer si un plugin terminó de enviar datos
     private var transmisionCompletada = false
@@ -35,6 +45,7 @@ class Plugin (val jarFile: File, val metodoCargado: Method, val metodoEjecucion:
         Companion.ID += 1
     }
 
+    // Id del plugin para la sesion actual
     val ID: AtomicLong = Companion.ID
 
     companion object {
@@ -58,12 +69,12 @@ class Plugin (val jarFile: File, val metodoCargado: Method, val metodoEjecucion:
      *
      * @return Respositorio<Inmueble> con los datos que se scrapeen
      */
-    private fun crearDataframe(): RepositorioInmueble<Inmueble>{
-        // TODO Crear un dataframe con una configuración más exhaustiva
+    private fun crearRepositorioInmuebles(): RepositorioInmueble<Inmueble>{
+        // TODO Crear un {[repositorioInmueble ]} con una configuración más exhaustiva
         val configuracion = ConfiguracionRepositorioInmueble()
         with(configuracion){
-            guardaCada(1, TimeUnit.MINUTES)
-            guardaLosDatosEn("/home/admin/Documentos/")
+            guardaCada(5, TimeUnit.SECONDS)
+            guardaLosDatosEn("/home/abraham/Documentos/")
             archivoConNombre("Prueba")
             archivoConExtension(Constantes.EXTENSIONES_ARCHIVOS.CSV)
         }
@@ -77,14 +88,21 @@ class Plugin (val jarFile: File, val metodoCargado: Method, val metodoEjecucion:
      */
     fun activar() {
 
-        val transmisor = this.metodoCargado.invoke(obj) as Transmisor<Inmueble>    // Obtenemos el transmisor del plugin
+        println(Thread.currentThread().name)
+
+        val transmisor = this.metodoCargado!!.invoke(obj) as Transmisor<Inmueble>    // Obtenemos el transmisor del plugin
 
         transmisor!!.subscribirse(object : Subscriber<Inmueble> {
 
             var subscripcion: Subscription? = null
 
             override fun onComplete() {
-                transmisionCompletada = true
+
+                transmisionCompletada = true                    // El plugin ha terminado de ejecutarse
+                val sujeto = repositorioInmueble.guardar()      // Guardamos los datos
+
+                // Comprobamos que se esten guardando los datos
+                if (sujeto != null){}
             }
 
             override fun onSubscribe(s: Subscription?) {
@@ -96,8 +114,8 @@ class Plugin (val jarFile: File, val metodoCargado: Method, val metodoEjecucion:
             }
 
             override fun onNext(t: Inmueble?) {
-                dataframe.anadirInmueble(t!!)
-                dataframe.guardar()
+
+                repositorioInmueble.anadirInmueble(t!!)
 
                 if (subscripcion != null){
                     subscripcion!!.request(1)
@@ -107,9 +125,11 @@ class Plugin (val jarFile: File, val metodoCargado: Method, val metodoEjecucion:
             override fun onError(t: Throwable?) {}
         })
 
-        metodoEjecucion.invoke(obj)
-
+        // Guardamos el transmisor
         setTransmisor(transmisor)
+
+        // Comenzamos a recibir inmuebles
+        metodoEjecucion.invoke(obj)
     }
 
     /**
@@ -117,7 +137,7 @@ class Plugin (val jarFile: File, val metodoCargado: Method, val metodoEjecucion:
      * de ejecutarse
      */
     fun haTerminado():Boolean{
-        return dataframe.todoGuardado() && transmisionCompletada
+        return repositorioInmueble.todoGuardado() && transmisionCompletada
     }
 
     fun setTransmisor(transmisor: Transmisor<Inmueble>){

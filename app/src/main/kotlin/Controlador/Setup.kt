@@ -1,7 +1,6 @@
 package Controlador
 
 import Controlador.Excepciones.ComandoException
-import Modelo.PropiedadesService
 import Utiles.Constantes
 import Utiles.Utils
 import com.andreapivetta.kolor.Color
@@ -26,7 +25,7 @@ object Setup {
 
         // Creamos el documentos con las propiedades del programa
         // si no existe, sino lo cargaremos en memoria
-        PropiedadesService.getPropiedades()
+        Modelo.Preferencias.getPropiedades()
 
         // Aplicamos los argumentos pasados por parámetros
         if (args.size > 0){
@@ -56,12 +55,12 @@ object Setup {
         if (esPrimeraVez()){
 
             // Comprobamos si no hay ninguna ruta del directorio de plugins establecida
-            if (PropiedadesService.getPropiedades().getOrNull(Key(Constantes.RUTA_PLUGINS_KEY, stringType)) == null && Constantes.DIRECTORIO_PLUGINS == null){
+            if (Modelo.Preferencias.getPropiedades().getOrNull(Key(Constantes.RUTA_PLUGINS_KEY, stringType)) == null && Constantes.DIRECTORIO_PLUGINS == null){
                 crearDirectorioPorDefecto()
             }
 
             // Primera ejecución del programa realizada
-            PropiedadesService.add(Constantes.PRIMERA_VEZ_KEY, true)
+            Modelo.Preferencias.add(Constantes.PRIMERA_VEZ_KEY, true)
         }
 
 
@@ -111,7 +110,7 @@ object Setup {
      * @return Boolean: Si ya lo  hemos ejecutado anteriormente
      */
     private fun esPrimeraVez(): Boolean{
-        val propiedades = PropiedadesService.getPropiedades()
+        val propiedades = Modelo.Preferencias.getPropiedades()
         val primeraVez = Key("YaEjecutado", booleanType)
 
         // Es la primera vez que lo ejecutamos
@@ -136,7 +135,7 @@ object Setup {
             directorioPlugins.mkdir()
 
             // Si se ha creado el directorio, lo guardamos en el archivo de configuración
-            PropiedadesService.add(Constantes.RUTA_PLUGINS_KEY, Constantes.DIRECTORIO_DOCUMENTOS + Constantes.NOMBRE_DIRECTORIO_PLUGINS)
+            Modelo.Preferencias.add(Constantes.RUTA_PLUGINS_KEY, Constantes.DIRECTORIO_DOCUMENTOS + Constantes.NOMBRE_DIRECTORIO_PLUGINS)
 
             // Guardamos la ruta del directorio en memoria
             Constantes.DIRECTORIO_PLUGINS = Constantes.DIRECTORIO_DOCUMENTOS + Constantes.NOMBRE_DIRECTORIO_PLUGINS
@@ -217,7 +216,7 @@ object Setup {
                         val key = Key(Constantes.RUTA_PLUGINS_KEY, stringType)
 
                         // Actualizamos la ruta en la que buscaremos los plugins en el archivo de confiruación
-                        PropiedadesService.modify(key,f.absolutePath, true)
+                        Modelo.Preferencias.modify(key,f.absolutePath, true)
                         Constantes.DIRECTORIO_PLUGINS = f.absolutePath
 
                         return

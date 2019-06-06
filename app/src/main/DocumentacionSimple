@@ -7,7 +7,7 @@ raíz del jar.
 -- 2 --
 Esta clase debe de contener alguno de los siguientes métodos de cargado:
 
-    fun obtenerComunicador(): PublishProcessor<Inmueble>
+    fun obtenerComunicador(): Transmisor<Inmueble>
 -------
 
 -- 3 --

@@ -13,23 +13,19 @@ import kotlinx.coroutines.runBlocking
  */
 fun main(args: Array<String>){
 
-    // Realizamos las comprobaciones iniciales del programa
-    Setup.realizarComprobaciones(args)
+    runBlocking {
 
-    // Comprobamos los plugins existentes y los ejecutamos
-    val office = Office.getInstancia()
+        // Realizamos las comprobaciones iniciales del programa
+        Setup.realizarComprobaciones(args)
 
-    if(office.hayPluginsValidos()){
+        // Comprobamos los plugins existentes y los ejecutamos
+        val office = Office.getInstancia()
 
-        office.cargarPlugins()      // Cargamos en memoria los plugins
+        if(office.hayPluginsValidos()){
 
-        office.ejecutarPlugins()    // Ejecutamos los plugins cargados
-    }
+            office.cargarPlugins()      // Cargamos en memoria los plugins
 
-    while (!office.haTerminado()){
-        runBlocking {
-            delay(1000)
+            office.ejecutarPlugins()    // Ejecutamos los plugins cargados
         }
     }
-
 }

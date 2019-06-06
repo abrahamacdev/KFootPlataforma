@@ -8,6 +8,7 @@ import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.toObservable
+import io.reactivex.subjects.PublishSubject
 import java.io.File
 import java.lang.reflect.Method
 import java.net.URL
@@ -20,8 +21,7 @@ import kotlin.collections.HashMap
 /**
  * Esta clase se encarga de toddo lo relacionado con los plugins
  * de la plataforma KScrap. Desde aquí cargaremos en memoria los
- * diferentes plugins y los ejecutaremos para comenzar el proceso de
- * obtención de datos
+ * diferentes plugins y
  * @version 1.0
  * @author Abraham
  */
@@ -30,14 +30,20 @@ class Office{
     // Lista de plugins que se ejecutarán posteriormente
     private var plugins: ArrayList<Plugin> = ArrayList()
 
+
     companion object {
 
         // Lista de métodos que podrá tener un plugin para ser ejecutado
         private val METODOS_EJECUCION: HashMap<String,String> = HashMap(mapOf("obtenerOfertas" to Void.TYPE.canonicalName))
 
         // Lista de métodos que tendrá que tener un plugin para ser cargado
-        private val METODOS_CARGADO: HashMap<String,String> = HashMap(mapOf("obtenerTransmisor" to Transmisor.crear<Inmueble>().javaClass.canonicalName))
+        private val METODOS_CARGADO: HashMap<String,String> = HashMap(
+                // obtenerTransmisor: Transmisor<Inmueble>
+                mapOf("obtenerTransmisor" to Transmisor.crear<Inmueble>().javaClass.canonicalName)
+        )
 
+        // Instancia del {[Office]}
+        @Volatile
         private var instancia: Office? = null;
 
         @Synchronized
@@ -229,22 +235,10 @@ class Office{
      */
     fun ejecutarPlugins(){
 
-        with(Supervisor.getInstancia()){
+        with(Supervisor.getInstancia(this)){
             anadirListaPlugin(plugins)
             lanzarPlugins()
         }
-    }
-
-    /**
-     * Comprobamos que se hallan terminado
-     * de ejecutar los plugins por completo
-     *
-     * @see {[Supervisor.pluginsFinalizados]]}
-     *
-     * @return Boolean si se ha terminado la ejecución o no
-     */
-    fun haTerminado(): Boolean{
-        return Supervisor.getInstancia().pluginsFinalizados()
     }
 
     /**
@@ -313,8 +307,7 @@ class Office{
                     var tipoRetorno = classTransmisor.getDeclaredMethod("getTipoTransmisor").invoke(transmisor) as Class<*>
 
                     // Si el tipo de dato extiende de {[Inmueble]}, será válido
-                    if (tipoRetorno.superclass.canonicalName.equals(Inmueble().javaClass.canonicalName)){
-
+                    if (tipoRetorno.superclass.canonicalName.equals(Inmueble().javaClass.canonicalName) || tipoRetorno.canonicalName.equals(Inmueble().javaClass.canonicalName)){
                         return true
                     }
                 }

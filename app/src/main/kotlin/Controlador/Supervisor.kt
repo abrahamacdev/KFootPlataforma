@@ -1,12 +1,15 @@
 package Controlador
 
 import Modelo.Plugin
+import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.*
 
 class Supervisor {
 
     private val plugins: ArrayList<Plugin> = ArrayList()
     private var estaEjecutando: Boolean = false
+
+    // TODO Ejecutar plugins en una coroutina propia
     private val coroutinaPlugin: HashMap<Plugin, Deferred<Any>> = HashMap()
 
     companion object {
@@ -15,7 +18,7 @@ class Supervisor {
         private var instancia: Supervisor? = null;
 
         @Synchronized
-        fun getInstancia(): Supervisor{
+        fun getInstancia(office: Office): Supervisor{
 
             if (instancia == null){
                 instancia = Supervisor()
@@ -23,7 +26,6 @@ class Supervisor {
 
             return instancia!!
         }
-
     }
 
     private constructor()
@@ -39,11 +41,12 @@ class Supervisor {
         // Evitamos añadir plugins cuando se están ejecutando
         if (!estaEjecutando){
 
+            // Comprobamos si el plugin ya esta en la lista
             val yaAnadido = plugins.firstOrNull{ it.equals(plugin) }
 
-            // El plugin no ha sido añadido aún
+            // El plugin no ha sido añadido aún a la lista
             if (yaAnadido == null){
-                plugins.add(plugin)
+                plugins.add(plugin)                             // Añadimos el plugin a la lista de plugins que se van a ejecutar
             }
         }
     }
@@ -123,7 +126,6 @@ class Supervisor {
         plugins.forEach { plugin ->
 
             plugin.activar()
-
         }
     }
 
@@ -133,7 +135,7 @@ class Supervisor {
      *
      * @return Boolean si han terminado todos o no
      */
-    fun pluginsFinalizados(): Boolean{
+    private fun pluginsFinalizados(): Boolean{
         return plugins.all { it.haTerminado() }
     }
 }

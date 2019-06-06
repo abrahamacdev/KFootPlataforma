@@ -38,7 +38,7 @@ dependencies {
     compile 'com.natpryce:konfig:1.6.10.0'
 
     // Librería KScrap
-    compile fileTree(dir: 'libs/KScrapLib/', include: '*.jar')
+    compile fileTree(dir: 'libs/KScrapLib', include: '*.jar')
     
 }
 

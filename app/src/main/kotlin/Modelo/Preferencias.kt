@@ -1,14 +1,13 @@
-package Modelo.Preferencias
+package Modelo
 
 import Utiles.Constantes
 import Utiles.Utils
 import com.andreapivetta.kolor.Color
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.Key
-import com.natpryce.konfig.wrappedAs
 import java.io.*
 
-object Propiedades{
+object Preferencias{
 
     private var propiedades: ConfigurationProperties? = null
     private val RUTA_ARCHIVO = File("app/src/main/resources/KScrap.properties")
