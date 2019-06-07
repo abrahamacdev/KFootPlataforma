@@ -1,31 +1,31 @@
 import Controlador.Office
 import Controlador.Setup
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
 /**
- * Desde aquí lanzaremos el "Office" u "Oficina" desde la que se cargaŕan
- * los diferente plugins para la obtención de los inmuebles de sus respectivas
- * páginas web.
+ * Desde aquí lanzaremos el "Office" desde donde se cargaŕan
+ * los diferente plugins para la obtención de los datos
  *
  * @author Abraham Álvarez
  * @since 1.0
  */
-fun main(args: Array<String>){
+fun main(args: Array<String>) = runBlocking<Unit> {
 
-    runBlocking {
+    // Realizamos las comprobaciones iniciales del programa
+    Setup.realizarComprobaciones(args)
 
-        // Realizamos las comprobaciones iniciales del programa
-        Setup.realizarComprobaciones(args)
+    // Obtenemos el office que se encargara de comprobar los plugins
+    // existentes y de lanzarlos
+    val office = Office.instancia
 
-        // Comprobamos los plugins existentes y los ejecutamos
-        val office = Office.getInstancia()
+    // Si hay plugins validos, los cargaremos y ejecutaremos
+    if(office.hayPluginsValidos()){
 
-        if(office.hayPluginsValidos()){
+        office.cargarPlugins()      // Cargamos en memoria los plugins
 
-            office.cargarPlugins()      // Cargamos en memoria los plugins
-
-            office.ejecutarPlugins()    // Ejecutamos los plugins cargados
-        }
+        office.ejecutarPlugins()    // Ejecutamos los plugins cargados
     }
+
+    // Se encarga de cerrar la aplicacion correctamente
+    Office.cerrarAplicacion()
 }

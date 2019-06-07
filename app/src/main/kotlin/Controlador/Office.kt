@@ -9,10 +9,14 @@ import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.toObservable
 import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.supervisorScope
 import java.io.File
 import java.lang.reflect.Method
 import java.net.URL
 import java.net.URLClassLoader
+import java.sql.Time
+import java.util.concurrent.TimeUnit
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import kotlin.collections.ArrayList
@@ -42,22 +46,47 @@ class Office{
                 mapOf("obtenerTransmisor" to Transmisor.crear<Inmueble>().javaClass.canonicalName)
         )
 
-        // Instancia del {[Office]}
-        @Volatile
-        private var instancia: Office? = null;
+        // Instancia del [Office]
+        val instancia: Office = Office();
 
+        /**
+         * Comprobamos que la plataforma se cierre correctamente,
+         * ejecutando las acciones oportunas para asegurar la integridad
+         */
+        @JvmStatic
         @Synchronized
-        fun getInstancia(): Office{
+        suspend fun cerrarAplicacion(forzado: Boolean = false){
 
-            if (instancia == null){
-                instancia = Office()
+            // Comprobamos si todos los plugins han terminado de ejecutarse
+            if (!Supervisor.instancia.comprobarTodosPluginsFinalizados()){
+
+                // EL cierre sera forzado
+                if (forzado){
+
+                    // Forzamos que los plugins finalicen su ejecucion
+                    Supervisor.instancia.forzarFinEjecucionPlugins()
+
+                    // Esperamos 3 segundos antes de cerrar la aplicacion
+                    Observable.timer(3, TimeUnit.SECONDS).subscribe({},{},{
+                        System.exit(0)
+                    })
+
+                }
+
+                // Esperamos y luego forzamos el cierre
+                else {
+
+                    Supervisor.instancia.esperarFinalizacionPlugins()
+
+                    System.exit(0)
+                }
             }
-
-            return instancia!!
         }
     }
 
     private constructor()
+
+
 
     /**
      * Comprobamos si hay plugins válidos en el directorio de plugins
@@ -145,33 +174,6 @@ class Office{
     }
 
     /**
-     * Obtenemos todos los .jar del directorio de plugins establecido
-     *
-     * @return Observable<File>?: Observable con los archivos que son .jar
-     */
-    private fun obtenerJarsDirPlugins(): Observable<File>?{
-
-        // Observable con todoo el contenido de un directorio
-        val archivos: Observable<File> = File(Constantes.DIRECTORIO_PLUGINS).listFiles().toObservable()
-
-        // Lista con todos los jars del directorio
-        val jars: ArrayList<File> = ArrayList()
-
-        // Filtramos por su extensión
-        archivos.filter { it.isFile && it.extension.equals("jar")}
-                .subscribe{
-                    jars.add(it)
-                }
-
-        // Si hay '.jar's devolveremos el observable
-        if (jars.size >= 0){
-            return jars.toObservable()
-        }
-
-        return null
-    }
-
-    /**
      * Cargamos todos los plugins válidos en memoria
      * para su posterior ejecución
      */
@@ -233,12 +235,41 @@ class Office{
      * Pasamos la lista de plugins al supervisor
      * y le pedimos que los ejecute
      */
-    fun ejecutarPlugins(){
+    suspend fun ejecutarPlugins(){
 
-        with(Supervisor.getInstancia(this)){
+        with(Supervisor.instancia!!){
             anadirListaPlugin(plugins)
             lanzarPlugins()
         }
+    }
+
+
+
+    /**
+     * Obtenemos todos los .jar del directorio de plugins establecido
+     *
+     * @return Observable<File>?: Observable con los archivos que son .jar
+     */
+    private fun obtenerJarsDirPlugins(): Observable<File>?{
+
+        // Observable con todoo el contenido de un directorio
+        val archivos: Observable<File> = File(Constantes.DIRECTORIO_PLUGINS).listFiles().toObservable()
+
+        // Lista con todos los jars del directorio
+        val jars: ArrayList<File> = ArrayList()
+
+        // Filtramos por su extensión
+        archivos.filter { it.isFile && it.extension.equals("jar")}
+                .subscribe{
+                    jars.add(it)
+                }
+
+        // Si hay '.jar's devolveremos el observable
+        if (jars.size >= 0){
+            return jars.toObservable()
+        }
+
+        return null
     }
 
     /**
@@ -354,5 +385,4 @@ class Office{
         }
         return false
     }
-
 }

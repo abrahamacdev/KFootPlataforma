@@ -7,43 +7,56 @@ import com.kscrap.libreria.Modelo.Repositorio.ConfiguracionRepositorioInmueble
 import com.kscrap.libreria.Modelo.Repositorio.RepositorioInmueble
 import com.kscrap.libreria.Utiles.Constantes
 import io.reactivex.subjects.PublishSubject
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.reactivestreams.Subscriber
 import org.reactivestreams.Subscription
 import java.io.File
 import java.lang.reflect.Method
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.coroutines.CoroutineContext
 
 /**
- * Esta clase recoge todos los datos necesarios para poder lanzar un plugin.
- * Cada vez que se vaya a ejecutar un plugin, se creara un nuevo objeto de este tipo
- * que contenta entre otras cosas:
+ * Esta clase se encarga de ejecutar cada uno de los plugins que se encuentren disponibles.
+ * La ejecucion del plugin se realizara en una coroutina dedicada para las
+ * tareas CPU-Intensivas
+ *
  * @param jarFile: Archivo jar con el codigo del plugin a ejecutar
  * @param metodoCargado: Este metodo de cargado se utilizara para obtener algun objeto que nos permita pasar informacion del plugin a la plataforma
  * @param metodoEjecucion: Este metodo se llamara para comenzar la ejecucion del plugin
  * @param clasePrincipal: Clase que contiene el metodo de cargado y ejecucion del plugin
  * @param nombrePlugin: Nombre del plugin
  */
-class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion: Method, val clasePrincipal: Class<*>, val nombrePlugin: String = "Desconocido"){
+class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion: Method, val clasePrincipal: Class<*>, val nombrePlugin: String = "Desconocido"): CoroutineScope{
 
     // Instancia de la clase principal del plugin
     private val obj = this.clasePrincipal.newInstance()
 
-    // Transmisor que utiliza el plugin para transmitir la informacion
-    private var transmisor: Transmisor<Inmueble>? = null
-
     // RepositorioInmueble en el que iremos guardando los datos que se scrapeen
-    private val repositorioInmueble = crearRepositorioInmuebles()
+    private val repositorioInmueble: RepositorioInmueble<Inmueble> by lazy {
+        RepositorioInmueble.create<Inmueble>(propiedades = configuracion)
+    }
+
+    // Configuracion que utilizara el repositorioInmueble
+    val configuracion: ConfiguracionRepositorioInmueble by lazy {
+        cargarConfiguracionRepInmuble()
+    }
 
     // Nos servirá para conocer si un plugin terminó de enviar datos
     private var transmisionCompletada = false
 
-    init {
-        Companion.ID += 1
-    }
+    // Tarea vinculada al Plugin
+    val job = Job()
+
+    // Estado actual del plugin
+    private var estado = EstadosPlugin.INACTIVO
+
+    // Transmisor que usaremos para recibir los datos del plugin
+    lateinit var transmisor: Transmisor<Inmueble>
+
+    // Coroutina en la que se ejecutara la tarea
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Default + job
 
     // Id del plugin para la sesion actual
     val ID: AtomicLong = Companion.ID
@@ -52,6 +65,14 @@ class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion
 
         // Nos servirá para identificar a cada plugin unequívocamente
         private var ID: AtomicLong = AtomicLong(0)
+
+        // Actualizamos el valor del ID
+        get() {
+            val temp = field
+            field+=1
+            return temp
+        }
+
     }
 
     override fun equals(o: Any?): Boolean {
@@ -62,74 +83,109 @@ class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion
         return ID === plugin.ID
     }
 
+
+
     /**
-     * Creamos el {[RepositorioInmueble]} en el que
-     * se almacenará la información que se scrapee del
-     * plugin
+     * Cargamos la configuracion que se utilizara para el
+     * repositorioInmueble
      *
-     * @return Respositorio<Inmueble> con los datos que se scrapeen
+     * @return ConfiguracionRepositorioInmueble: COnfiguracion que estableceremos para el [repositorioInmueble]
      */
-    private fun crearRepositorioInmuebles(): RepositorioInmueble<Inmueble>{
-        // TODO Crear un {[repositorioInmueble ]} con una configuración más exhaustiva
+    fun cargarConfiguracionRepInmuble(): ConfiguracionRepositorioInmueble{
         val configuracion = ConfiguracionRepositorioInmueble()
         with(configuracion){
-            guardaCada(5, TimeUnit.SECONDS)
             guardaLosDatosEn("/home/abraham/Documentos/")
             archivoConNombre("Prueba")
             archivoConExtension(Constantes.EXTENSIONES_ARCHIVOS.CSV)
         }
-
-        return RepositorioInmueble.create<Inmueble>(propiedades = configuracion)
+        return configuracion
     }
 
     /**
+     * Retornamos la direccion absoluta del archivo en
+     * el que se guardara la informacion que se vaya scrapean
+     *
+     * @return File: Archivo en el que se guardaran lo datos
+     */
+    fun obtenerRutaArchivoGuardado(): File{
+
+        val archivo: File = with(configuracion){
+            File(getRutaGuardadoArchivos() + "/" + getNombreArchivo() + "." + getExtensionArchivo().name)
+        }
+
+        return archivo
+    }
+
+
+    /**
      * Activamos el plugin para que comience a ejecutarse
-     * en una corutina
+     * en su propia coroutina
      */
     fun activar() {
 
-        println(Thread.currentThread().name)
+        // Ejecutamos el plugin en la coroutina dedicada
+        launch(coroutineContext){
+            // Obtenemos el transmisor del plugin
+            this@Plugin.transmisor = this@Plugin.metodoCargado!!.invoke(obj) as Transmisor<Inmueble>
 
-        val transmisor = this.metodoCargado!!.invoke(obj) as Transmisor<Inmueble>    // Obtenemos el transmisor del plugin
+            // Nos conectamos al transmisor del plugin para comenzar a recibir los datos
+            this@Plugin.transmisor!!.subscribirse(object : Subscriber<Inmueble> {
 
-        transmisor!!.subscribirse(object : Subscriber<Inmueble> {
+                var subscripcion: Subscription? = null
 
-            var subscripcion: Subscription? = null
+                override fun onComplete() {
 
-            override fun onComplete() {
+                    this@Plugin.transmisionCompletada = true                    // El plugin ha terminado de ejecutarse, no se recibiran mas datos
+                    val sujeto = this@Plugin.repositorioInmueble.guardar()      // Guardamos los datos del repositorio
 
-                transmisionCompletada = true                    // El plugin ha terminado de ejecutarse
-                val sujeto = repositorioInmueble.guardar()      // Guardamos los datos
+                    // Comprobamos que se esten guardando los datos
+                    if (sujeto != null){
 
-                // Comprobamos que se esten guardando los datos
-                if (sujeto != null){}
-            }
-
-            override fun onSubscribe(s: Subscription?) {
-                subscripcion = s
-
-                if (s != null){
-                    s!!.request(1)
+                        // Cuando se halla completado el guardado
+                        // cancelaremos la coroutina
+                        sujeto.subscribe({},{},{
+                            job.cancel()                        // Cancelamos la coroutina en la que se esta ejecutando el plugin
+                            estado = EstadosPlugin.COMPLETADO   // Cambiamos el estado del plugin
+                        })
+                    }
                 }
-            }
 
-            override fun onNext(t: Inmueble?) {
+                override fun onSubscribe(s: Subscription?) {
 
-                repositorioInmueble.anadirInmueble(t!!)
+                    // COmenzamos a solicitar datos
+                    if (s != null){
 
-                if (subscripcion != null){
-                    subscripcion!!.request(1)
+                        // Cambiamos el estado del plugin a activo
+                        estado = EstadosPlugin.ACTIVO
+
+                        // Guardamos la subscripcion
+                        subscripcion = s
+                        s!!.request(1)
+                    }
+
+                    else {
+                        // Cambiamos el estado del plugin a inactivo
+                        estado = EstadosPlugin.INACTIVO
+                    }
                 }
-            }
 
-            override fun onError(t: Throwable?) {}
-        })
+                override fun onNext(t: Inmueble?) {
 
-        // Guardamos el transmisor
-        setTransmisor(transmisor)
+                    // Guardamos el inmueble en el repositorio
+                    repositorioInmueble.anadirInmueble(t!!)
 
-        // Comenzamos a recibir inmuebles
-        metodoEjecucion.invoke(obj)
+                    // Seguimos solicitando mas viviendas
+                    if (subscripcion != null){
+                        subscripcion!!.request(1)
+                    }
+                }
+
+                override fun onError(t: Throwable?) {}
+            })
+
+            // Comenzamos a recibir inmuebles
+            metodoEjecucion.invoke(obj)
+        }
     }
 
     /**
@@ -137,13 +193,34 @@ class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion
      * de ejecutarse
      */
     fun haTerminado():Boolean{
-        return repositorioInmueble.todoGuardado() && transmisionCompletada
-    }
 
-    fun setTransmisor(transmisor: Transmisor<Inmueble>){
-        if(this.transmisor == null){
-            this.transmisor = transmisor
+        // Todos los datos han sido obtenidos y guardados
+        if (estado == EstadosPlugin.COMPLETADO){
+            return true
+        }
+
+        else {
+
+            // Los datos han sido obtenidos y guardados pero no se ha actualizado el
+            // estado del plugin
+            if (repositorioInmueble.todoGuardado() && transmisionCompletada){
+                estado == EstadosPlugin.COMPLETADO
+
+                return true
+            }
+
+            return false
         }
     }
 
+    /**
+     * Forzamos el fin de la ejecucion del
+     * plugin actual
+     */
+    fun forzarAcabadoPlugin(){
+
+        // Forzamos la llamada al metodo onComplete del transmisor
+        // para que guarde los datos que se hallan scrapeado hasta el momento
+        this.transmisor.terminarEnvio()
+    }
 }
