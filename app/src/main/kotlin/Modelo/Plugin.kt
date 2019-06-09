@@ -38,7 +38,7 @@ class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion
     }
 
     // Configuracion que utilizara el repositorioInmueble
-    val configuracion: ConfiguracionRepositorioInmueble by lazy {
+    private val configuracion: ConfiguracionRepositorioInmueble by lazy {
         cargarConfiguracionRepInmuble()
     }
 
@@ -95,8 +95,7 @@ class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion
         val configuracion = ConfiguracionRepositorioInmueble()
         with(configuracion){
             guardaLosDatosEn("/home/abraham/Documentos/")
-            archivoConNombre("Prueba")
-            archivoConExtension(Constantes.EXTENSIONES_ARCHIVOS.CSV)
+            archivoConExtension(Constantes.EXTENSIONES_ARCHIVOS.csv)
         }
         return configuracion
     }
@@ -116,6 +115,16 @@ class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion
         return archivo
     }
 
+    /**
+     * Establecemos la nueva ruta del archivo en el que se
+     * guardaran los datos
+     *
+     * @param nuevaRuta: Nueva ruta del archivo
+     */
+    fun establecerNuevaRutaArchivo(nuevaRuta: String){
+        configuracion.establecerRutaArchivo(nuevaRuta)
+    }
+
 
     /**
      * Activamos el plugin para que comience a ejecutarse
@@ -125,6 +134,7 @@ class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion
 
         // Ejecutamos el plugin en la coroutina dedicada
         launch(coroutineContext){
+
             // Obtenemos el transmisor del plugin
             this@Plugin.transmisor = this@Plugin.metodoCargado!!.invoke(obj) as Transmisor<Inmueble>
 
@@ -135,18 +145,20 @@ class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion
 
                 override fun onComplete() {
 
-                    this@Plugin.transmisionCompletada = true                    // El plugin ha terminado de ejecutarse, no se recibiran mas datos
-                    val sujeto = this@Plugin.repositorioInmueble.guardar()      // Guardamos los datos del repositorio
+                    // El plugin ha terminado de ejecutarse, no se recibiran mas datos
+                    this@Plugin.transmisionCompletada = true
 
-                    // Comprobamos que se esten guardando los datos
-                    if (sujeto != null){
+                    // Cuando hallan terminado de guardarse los datos,
+                    // terminaremos la coroutina
+                    val sujeto = PublishSubject.create<Nothing>()
+                    sujeto.subscribe({},{},{
+                        estado = EstadosPlugin.COMPLETADO   // Cambiamos el estado del plugin
+                        job.cancel()                        // Cancelamos la coroutina en la que se esta ejecutando el plugin
+                    })
 
-                        // Cuando se halla completado el guardado
-                        // cancelaremos la coroutina
-                        sujeto.subscribe({},{},{
-                            job.cancel()                        // Cancelamos la coroutina en la que se esta ejecutando el plugin
-                            estado = EstadosPlugin.COMPLETADO   // Cambiamos el estado del plugin
-                        })
+                    // Ejecutamos el guardado dentro de la coroutina
+                    this@launch.launch {
+                        this@Plugin.repositorioInmueble.guardar(sujeto)
                     }
                 }
 
@@ -223,4 +235,5 @@ class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion
         // para que guarde los datos que se hallan scrapeado hasta el momento
         this.transmisor.terminarEnvio()
     }
+
 }

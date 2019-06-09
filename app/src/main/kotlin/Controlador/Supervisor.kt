@@ -224,13 +224,27 @@ class Supervisor {
                 val rutaArchivoNuevo = plugin.obtenerRutaArchivoGuardado()
 
                 val modificaMismoArchivo = plugins.firstOrNull{
-                    println(it.obtenerRutaArchivoGuardado().toString() + " = " + rutaArchivoNuevo.toString())
                     it.obtenerRutaArchivoGuardado() == rutaArchivoNuevo
                 }
 
                 // No hay ningun plugin que guarda los datos
                 // en el mismo archivo
                 if (modificaMismoArchivo == null) {
+
+                    return true
+                }
+
+                // Modificamos la ruta del plugin nuevo
+                else {
+
+                    // Obtenemos la ruta y el nombre del archivo
+                    val rutaViejaCompleta = rutaArchivoNuevo.absolutePath.split(".")
+
+                    // Concatenamos despues del nombre un numero entre parentesis y le añadimos por ultimo la extension
+                    val nuevaRuta = rutaViejaCompleta[0] + "(${plugins.size})" + "." + rutaViejaCompleta[1]
+
+                    // Establecemos la nueva ruta
+                    plugin.establecerNuevaRutaArchivo(nuevaRuta)
 
                     return true
                 }
