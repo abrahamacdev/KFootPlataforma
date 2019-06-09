@@ -1,6 +1,8 @@
 package Modelo
 
+import Utiles.Utils
 import Utiles.plus
+import com.andreapivetta.kolor.Color
 import com.kscrap.libreria.Controlador.Transmisor
 import com.kscrap.libreria.Modelo.Dominio.Inmueble
 import com.kscrap.libreria.Modelo.Repositorio.ConfiguracionRepositorioInmueble
@@ -12,7 +14,6 @@ import org.reactivestreams.Subscriber
 import org.reactivestreams.Subscription
 import java.io.File
 import java.lang.reflect.Method
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.coroutines.CoroutineContext
 
@@ -190,6 +191,9 @@ class Plugin (val jarFile: File, val metodoCargado: Method?, val metodoEjecucion
                     if (subscripcion != null){
                         subscripcion!!.request(1)
                     }
+
+                    // Muestra en que hilo se esta añadiendo el inmueble
+                    Utils.debug(Utiles.Constantes.DEBUG.DEBUG_TEST,"(ID Plugin ${this@Plugin.ID}) Añadiendo inmueble en el hilo ${Thread.currentThread().name}", Color.GREEN)
                 }
 
                 override fun onError(t: Throwable?) {}

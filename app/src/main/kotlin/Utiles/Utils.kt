@@ -15,6 +15,7 @@ object Utils {
      * @param Color color: Color con el que se mostrará el mensaje
      */
     fun debug(nivelRequerido: Constantes.DEBUG, mensaje: String, color: Color = Color.BLACK){
+
         // Comprobamos que queremos loguear
         if (Constantes.DEBUG.DEBUG_LEVEL.value != Constantes.DEBUG.DEBUG_NONE.value){
 
