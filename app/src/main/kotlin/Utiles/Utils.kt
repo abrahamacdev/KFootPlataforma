@@ -2,6 +2,7 @@ package Utiles
 
 import com.andreapivetta.kolor.Color
 import com.andreapivetta.kolor.Kolor
+import com.kscrap.libreria.Utiles.Utils
 import java.util.concurrent.atomic.AtomicLong
 
 object Utils {
@@ -29,6 +30,30 @@ object Utils {
             }
         }
     }
+
+    /**
+     * Comprobamos cual es el separador que hay que
+     * utilizar para las rutas del SO del cliente
+     *
+     * @return String: Separador que hay que utilizar en el SO
+     */
+    /*fun determinarSeparador(): String {
+
+        var separador = ""
+
+        // Recuperamos el SO que se esta ejecuutando en el cliente
+        val SO = Utils.determinarSistemaOperativo()
+
+        when {
+            // Windows
+            SO == com.kscrap.libreria.Utiles.Constantes.SO.WINDOWS -> {separador = "\\"}
+
+            // Ubuntu
+            SO == com.kscrap.libreria.Utiles.Constantes.SO.UBUNTU -> {separador = "/"}
+        }
+
+        return separador
+    }*/
 }
 
 // Permite la suma de dos números atómicos

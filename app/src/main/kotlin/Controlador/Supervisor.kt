@@ -129,26 +129,6 @@ class Supervisor {
         return false
     }
 
-
-
-    /**
-     * Desde aquí ejecutaremos todos los plugins
-     * válidos que hallan sido encontrados en el directorio
-     * de plugins establecido
-     */
-    suspend fun lanzarPlugins(){
-
-        // Bloqueamos la modificación de los plugins existentes
-        estaEjecutando = true
-
-        // Activamos todos los plugins de la lista
-        plugins.forEach { plugin ->
-
-            // Ejecutamos los plugins en una coroutina dedicada
-            plugin.activar()
-        }
-    }
-
     /**
      * Esperamos a que todos los plugins hallan terminado
      * de ejecutarse

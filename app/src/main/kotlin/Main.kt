@@ -1,4 +1,4 @@
-import Controlador.Office
+import Controlador.Office.Office
 import Controlador.Setup
 import kotlinx.coroutines.*
 
@@ -19,7 +19,7 @@ fun main(args: Array<String>) = runBlocking<Unit> {
     val office = Office.instancia
 
     // Si hay plugins validos, los cargaremos y ejecutaremos
-    if(office.hayPluginsValidos()){
+    if(office.existenPlugins()){
 
         office.cargarPlugins()      // Cargamos en memoria los plugins
 
