@@ -28,6 +28,8 @@ dependencies {
     // Logs con color
     compile "com.andreapivetta.kolor:kolor:0.0.2"
 
+    implementation 'com.beust:klaxon:5.0.1'
+    
     // JDBC
     //compile "org.xerial:sqlite-jdbc:3.21.0.1"
 

@@ -1,19 +1,12 @@
 package Modelo
 
 import Utiles.plus
-import com.kscrap.libreria.Controlador.Transmisor
-import com.kscrap.libreria.Modelo.Dominio.Inmueble
-import com.kscrap.libreria.Modelo.Repositorio.ConfiguracionRepositorioInmueble
-import com.kscrap.libreria.Modelo.Repositorio.RepositorioInmueble
-import com.kscrap.libreria.Utiles.Constantes
-import io.reactivex.subjects.PublishSubject
+import com.beust.klaxon.Klaxon
 import kotlinx.coroutines.*
-import org.reactivestreams.Subscriber
-import org.reactivestreams.Subscription
+import nonapi.io.github.classgraph.json.JSONDeserializer
 import java.io.File
-import java.lang.reflect.Method
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
+import java.util.jar.JarFile
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -21,11 +14,10 @@ import kotlin.coroutines.CoroutineContext
  * La ejecucion del plugin se realizara en una coroutina dedicada para las
  * tareas CPU-Intensivas
  *
- * @param jarFile: Archivo jar con el codigo del plugin a ejecutar
+ * @param jar: Archivo jar con el codigo del plugin a ejecutar
  * @param clasePrincipal: Clase que contiene el metodo de cargado y ejecucion del plugin
- * @param nombrePlugin: Nombre del plugin
  */
-class Plugin (val jarFile: File, val clasePrincipal: Class<*>, var nombrePlugin: String = "Desconocido"): CoroutineScope{
+class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope{
 
     // Instancia de la clase principal del plugin
     private val obj = this.clasePrincipal.newInstance()
@@ -33,15 +25,22 @@ class Plugin (val jarFile: File, val clasePrincipal: Class<*>, var nombrePlugin:
     // Tarea vinculada al Plugin
     val job = Job()
 
-    // Estado actual del plugin
-    private var estado = EstadosPlugin.INACTIVO
-
     // Coroutina en la que se ejecutara la tarea
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default + job
 
     // Id del plugin para la sesion actual
     val ID: AtomicLong = Companion.ID
+
+    // Nombre del plugin
+    var nombrePlugin: String = "Desconocido"
+
+    // Version del plugin
+    var version: Double = -1.0
+
+    init {
+        cargarMetadatos()
+    }
 
     companion object {
 
@@ -66,7 +65,7 @@ class Plugin (val jarFile: File, val clasePrincipal: Class<*>, var nombrePlugin:
     }
 
     override fun toString(): String {
-        return "(Plugin) Id: $ID. Nombre: $nombrePlugin. Estado: $estado"
+        return "(Plugin) Id: $ID. Nombre: $nombrePlugin"
     }
 
 
@@ -79,7 +78,31 @@ class Plugin (val jarFile: File, val clasePrincipal: Class<*>, var nombrePlugin:
 
         // Ejecutamos el plugin en la coroutina dedicada
         launch(coroutineContext){
-            
+            println("Ejecutando plugin en ${Thread.currentThread().name}")
+        }
+    }
+
+    /**
+     * Obtenemos los metadatos del plugin
+     */
+    private fun cargarMetadatos(){
+
+        val jarFile = JarFile(jar)
+
+        // Cargamos el archivo json del jar
+        val configJson = jarFile.getEntry("config.json") ?: null
+
+        // Comprobamos si hay un archivo de metadatos
+        if (configJson != null){
+
+            // Leemos el contenido del jar
+            val texto = jarFile.getInputStream(configJson).bufferedReader()
+
+            // Convertimos el texto a un archivo json
+            val json = Klaxon().parseJsonObject(texto)
+
+            println(json)
+
         }
     }
 }

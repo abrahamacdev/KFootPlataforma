@@ -3,6 +3,7 @@ package Controlador.Office
 import Controlador.Supervisor
 import Modelo.Plugin
 import Utiles.Constantes
+import Utiles.Utils
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
@@ -24,9 +25,6 @@ import kotlin.collections.ArrayList
  */
 class Office: IOffice{
 
-    // Lista de plugins que se ejecutarán posteriormente
-    private var plugins: ArrayList<Plugin> = ArrayList()
-
     companion object {
 
         // Instancia del [Office]
@@ -39,31 +37,10 @@ class Office: IOffice{
         @JvmStatic
         @Synchronized
         suspend fun cerrarAplicacion(forzado: Boolean = false){
-
-            // Comprobamos si todos los plugins han terminado de ejecutarse
-            if (!Supervisor.instancia.comprobarTodosPluginsFinalizados()){
-
-                // EL cierre sera forzado
-                if (forzado){
-
-                    // Forzamos que los plugins finalicen su ejecucion
-                    Supervisor.instancia.forzarFinEjecucionPlugins()
-
-                    // Esperamos 3 segundos antes de cerrar la aplicacion
-                    Observable.timer(3, TimeUnit.SECONDS).subscribe({},{},{
-                        System.exit(0)
-                    })
-
-                }
-
-                // Esperamos y luego forzamos el cierre
-                else {
-
-                    Supervisor.instancia.esperarFinalizacionPlugins()
-
-                    System.exit(0)
-                }
-            }
+            // Esperamos 3 segundos antes de cerrar la aplicacion
+            Observable.timer(3, TimeUnit.SECONDS).subscribe({},{},{
+                System.exit(0)
+            })
         }
     }
 
@@ -76,7 +53,7 @@ class Office: IOffice{
      * @return Boolean: Si se ha encontrado al menos 1 plugin válido
      */
     override fun existenPlugins(): Boolean {
-        val jarsObservable: Observable<File>? = obtenerJarsDirPlugins()
+        val jarsObservable: Observable<File>? = Utils.obtenerJarsDirPlugins()
 
         var hayPlugins = false
 
@@ -139,7 +116,7 @@ class Office: IOffice{
     override fun cargarPlugins(){
 
         // Obtenemos todos los jars del directorio de plugins
-        val observableJars = obtenerJarsDirPlugins()
+        val observableJars = Utils.obtenerJarsDirPlugins()
 
         // Comprobamos que halla jars
         if (observableJars != null){
@@ -165,9 +142,9 @@ class Office: IOffice{
                         // Cargamos la primera clase válida que haya en el jar
                         val clase = urlClassLoader.loadClass(claseValida.get().name.split(".")[0])
 
-                        // Creamos un plugin con la ruta del jar
+                        // Creamos un plugin con la ruta del jar y la clase principal
                         val plugin = Plugin(jar, clase)
-                        plugins.add(plugin)
+                        Supervisor.instancia.anadirPlugin(plugin)
                     }
                 }
 
@@ -182,45 +159,6 @@ class Office: IOffice{
             // Terminamos de transmitir jars
             observer.onComplete()
         }
-    }
-
-    /**
-     * Ejecutamos cada uno de los plugins que se
-     * hayan cargado en memoria
-     */
-    override fun ejecutarPlugins(){
-
-
-
-    }
-
-
-
-    /**
-     * Obtenemos todos los .jar del directorio de plugins establecido
-     *
-     * @return Observable<File>?: Observable con los archivos que son .jar
-     */
-    private fun obtenerJarsDirPlugins(): Observable<File>?{
-
-        // Observable con todoo el contenido de un directorio
-        val archivos: Observable<File> = File(Constantes.DIRECTORIO_PLUGINS).listFiles().toObservable()
-
-        // Lista con todos los jars del directorio
-        val jars: ArrayList<File> = ArrayList()
-
-        // Filtramos por su extensión
-        archivos.filter { it.isFile && it.extension.equals("jar")}
-                .subscribe{
-                    jars.add(it)
-                }
-
-        // Si hay '.jar's devolveremos el observable
-        if (jars.size >= 0){
-            return jars.toObservable()
-        }
-
-        return null
     }
 
     /**

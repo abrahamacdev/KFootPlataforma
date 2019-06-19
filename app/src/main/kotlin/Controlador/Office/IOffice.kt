@@ -12,10 +12,4 @@ interface IOffice {
      * para ejecutarlos
      */
     fun cargarPlugins()
-
-    /**
-     * Ejecutamos todos los plugins que esten
-     * cargados en memoria
-     */
-    fun ejecutarPlugins()
 }

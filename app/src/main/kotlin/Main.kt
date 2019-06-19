@@ -23,7 +23,7 @@ fun main(args: Array<String>) = runBlocking<Unit> {
 
         office.cargarPlugins()      // Cargamos en memoria los plugins
 
-        office.ejecutarPlugins()    // Ejecutamos los plugins cargados
+        //office.ejecutarPlugins()    // Ejecutamos los plugins cargados
     }
 
     // Se encarga de cerrar la aplicacion correctamente
