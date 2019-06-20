@@ -3,16 +3,3 @@
 Para que un plugin se válido, debe de tener una clase "[Mm]ain" en el directorio
 raíz del jar.
 -------
-
--- 2 --
-Esta clase debe de contener alguno de los siguientes métodos de cargado:
-
-    fun obtenerComunicador(): Transmisor<Inmueble>
--------
-
--- 3 --
-Esta clase debe de contener alguno de los siguientes métodos de ejecución:
-
-    fun obtenerOfertas()
--------
-

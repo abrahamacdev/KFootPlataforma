@@ -1,9 +1,10 @@
-package Controlador
+package Controlador.Setup
 
 import Controlador.Excepciones.ComandoException
-import Utiles.Constantes
-import Utiles.Utils
 import com.andreapivetta.kolor.Color
+import Utiles.Constantes
+import KFoot.Constantes as KFootConstantes
+import KFoot.Utils as KFootUtils
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.booleanType
 import com.natpryce.konfig.stringType
@@ -42,7 +43,7 @@ object Setup {
                 }
 
                 override fun onNext(t: String) {
-                    aplicarCambios(t,this)
+                    aplicarCambios(t, this)
                 }
 
                 override fun onError(e: Throwable) {
@@ -74,8 +75,8 @@ object Setup {
             // se guardan los plugins del archivo KScrap.properties
             f == null -> {
                 // Ruta actual de los plugins no válida
-                Utils.debug(Constantes.DEBUG.DEBUG_SIMPLE,"No se ha encontrado la ruta por defecto del directorio con los plugins. Se establecerá " +
-                        "el predeterminado en \'${Constantes.DIRECTORIO_DOCUMENTOS + Constantes.DIRECTORIO_PLUGINS}\'",Color.RED)
+                KFootUtils.debug(KFootConstantes.DEBUG.DEBUG_SIMPLE,"No se ha encontrado la ruta por defecto del directorio con los plugins. Se establecerá " +
+                        "el predeterminado en \'${KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO}\'",Color.RED)
 
                 // Estableceremos la ruta por defecto '/Documentos/KScrapPlugins
                 crearDirectorioPorDefecto()
@@ -85,8 +86,8 @@ object Setup {
             !f.isDirectory -> {
 
                 // Ruta actual de los plugins no válida
-                Utils.debug(Constantes.DEBUG.DEBUG_SIMPLE,"El actual directorio de los plugins no es válido, se establecerá " +
-                        "el predeterminado en \'${Constantes.DIRECTORIO_DOCUMENTOS + Constantes.NOMBRE_DIRECTORIO_PLUGINS}\'",Color.RED)
+                KFootUtils.debug(KFootConstantes.DEBUG.DEBUG_SIMPLE,"El actual directorio de los plugins no es válido, se establecerá " +
+                        "el predeterminado en \'${KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO}\'",Color.RED)
 
                 // Estableceremos la ruta por defecto '/Documentos/KScrapPlugins
                 crearDirectorioPorDefecto()
@@ -95,7 +96,7 @@ object Setup {
             // No tenemos acceso al directorio
             !f.canRead() || !f.canExecute() || !f.canWrite() -> {
                 // Ruta actual de los plugins no válida
-                Utils.debug(Constantes.DEBUG.DEBUG_SIMPLE,"No se puede acceder al actual directorio de los plugins \'${f.absolutePath}, " +
+                KFootUtils.debug(KFootConstantes.DEBUG.DEBUG_SIMPLE,"No se puede acceder al actual directorio de los plugins \'${f.absolutePath}\', " +
                         "comprueba los permisos antes de continuar",Color.RED)// Ruta actual de los plugins no válida
 
                 // Terminamos la ejecución
@@ -125,8 +126,11 @@ object Setup {
      */
     private fun crearDirectorioPorDefecto(){
 
-        val directorioPlugins:File = File(Constantes.DIRECTORIO_DOCUMENTOS + Constantes.NOMBRE_DIRECTORIO_PLUGINS)
-        val directorioDocumentos: File = File(Constantes.DIRECTORIO_DOCUMENTOS)
+        // Directorio en el que se almacenaran los pluginss
+        val directorioPlugins:File = File(KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO)
+
+        // Directorio en el que crearemos la carpeta por defecto
+        val directorioDocumentos: File = File(KFootUtils.obtenerDirDocumentos())
 
         // Comprobamos que podamos esccriibir en el directorio "Documentos"
         if (directorioDocumentos.canWrite()){
@@ -135,13 +139,15 @@ object Setup {
             directorioPlugins.mkdir()
 
             // Si se ha creado el directorio, lo guardamos en el archivo de configuración
-            Modelo.Preferencias.add(Constantes.RUTA_PLUGINS_KEY, Constantes.DIRECTORIO_DOCUMENTOS + Constantes.NOMBRE_DIRECTORIO_PLUGINS)
+            Modelo.Preferencias.add(Constantes.RUTA_PLUGINS_KEY, KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO)
 
             // Guardamos la ruta del directorio en memoria
-            Constantes.DIRECTORIO_PLUGINS = Constantes.DIRECTORIO_DOCUMENTOS + Constantes.NOMBRE_DIRECTORIO_PLUGINS
+            Constantes.DIRECTORIO_PLUGINS = KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO
 
         }
     }
+
+
 
     /**
      * Convertimos un array de supuestos comandos en una lista
@@ -232,5 +238,4 @@ object Setup {
         // Por defecto enviaremos un error indicando que el comando no es válido
         observer.onError(ComandoException("El comando $comando no es válido. Revisa las opciones válidas"))
     }
-
 }
