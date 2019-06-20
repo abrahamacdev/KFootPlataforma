@@ -1,12 +1,12 @@
-package Controlador
+package Controlador.Supervisor
 
-import Modelo.Plugin
+import Modelo.Plugin.Plugin
 
 /**
  * El [Supervisor] se encarga de gestionar toddo lo relacionado con
  * la ejecucion de los plugins y de la correcta ejecucion de estos
  */
-class Supervisor {
+class Supervisor: ISupervisor {
 
     // Lista con los plugins a ejecutar
     private val plugins: ArrayList<Plugin> = ArrayList()
@@ -28,7 +28,7 @@ class Supervisor {
      *
      * @return Boolean: Si ha podido añadirse el plugin a la lista
      */
-    fun anadirPlugin(plugin: Plugin): Boolean{
+    override fun anadirPlugin(plugin: Plugin): Boolean{
 
         // Comprobamos si hay otro plugin con el mismo
         val existeCopia = plugins.firstOrNull(){
@@ -60,7 +60,7 @@ class Supervisor {
      *
      * @return List<Plugin>: Lista con los plugins que no pueden añadirse a la lista
      */
-    fun anadirListaPlugin(listaPlugin: List<Plugin>): List<Plugin>{
+    override fun anadirListaPlugins(listaPlugin: List<Plugin>): ArrayList<Plugin>{
 
         // Lista con los plugins no validos
         val noValidos = ArrayList<Plugin>()
@@ -90,7 +90,7 @@ class Supervisor {
      *
      * @return Boolean: Si se ha eliminado
      */
-    fun eliminarPlugin(indice: Int): Boolean{
+    override fun eliminarPlugin(indice: Int): Boolean{
 
         // TODO: Comprobar primero que el plugin no se este ejecutando
 
@@ -110,7 +110,7 @@ class Supervisor {
      *
      * @param plugin: Plugin que se buscara en el array
      */
-    fun eliminarPlugin(plugin: Plugin): Boolean{
+    override fun eliminarPlugin(plugin: Plugin): Boolean{
 
         // TODO: Comprobar primero que el plugin no se este ejecutando
 
@@ -130,25 +130,10 @@ class Supervisor {
 
 
     /**
-     * Esperamos a que todos los plugins hallan terminado
-     * de ejecutarse
+     * Ejecutamos todos los plugins que se encuentren en la lista,
+     * cada uno en una coroutina separada
      */
-    suspend fun esperarFinalizacionPlugins(){
-
-        // Esperamos a que se terminen de ejecutar los plugins
-        plugins.forEach {
-            it.job.join()
-        }
-
-        // Acciones post-ejecucion plugins
-        ejecucionFinalizada()
-    }
-
-    /**
-     * Esta funcion se ejecutara cada
-     * vez que todos los plugins hallan finalizado
-     */
-    fun ejecucionFinalizada(){
-        // TODO: Eliminar todos los plugins que se hallan ejecutado de la lista
+    override fun ejecutarPlugins() {
+        plugins.forEach { it.activar() }
     }
 }

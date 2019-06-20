@@ -1,9 +1,8 @@
-package Modelo
+package Modelo.Plugin
 
 import Utiles.plus
 import com.beust.klaxon.Klaxon
 import kotlinx.coroutines.*
-import nonapi.io.github.classgraph.json.JSONDeserializer
 import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 import java.util.jar.JarFile
@@ -32,15 +31,10 @@ class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope{
     // Id del plugin para la sesion actual
     val ID: AtomicLong = Companion.ID
 
-    // Nombre del plugin
-    var nombrePlugin: String = "Desconocido"
+    // Objeto que almacena los metadatos del plugin
+    private var metaPlugin: MetaPlugin? = null
 
-    // Version del plugin
-    var version: Double = -1.0
 
-    init {
-        cargarMetadatos()
-    }
 
     companion object {
 
@@ -65,7 +59,16 @@ class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope{
     }
 
     override fun toString(): String {
-        return "(Plugin) Id: $ID. Nombre: $nombrePlugin"
+        var msg = "(Plugin) Id: $ID. "
+
+        if (metaPlugin != null){
+           msg += "Nombre: ${metaPlugin!!.nombrePlugin}"
+        }
+        return msg
+    }
+
+    fun getMetaDatos(): MetaPlugin?{
+        return  metaPlugin
     }
 
 
@@ -83,26 +86,31 @@ class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope{
     }
 
     /**
-     * Obtenemos los metadatos del plugin
+     * Obtenemos los metadatos del plugin a traves
+     * de su archivo "config.json"
      */
-    private fun cargarMetadatos(){
+    fun cargarMetadatos(){
 
-        val jarFile = JarFile(jar)
+        // Comprobamos que aún no hayamos cargado los metadatos
+        if (metaPlugin == null){
 
-        // Cargamos el archivo json del jar
-        val configJson = jarFile.getEntry("config.json") ?: null
+            val jarFile = JarFile(jar)
 
-        // Comprobamos si hay un archivo de metadatos
-        if (configJson != null){
+            // Cargamos el archivo json del jar
+            val configJson = jarFile.getEntry("config.json") ?: null
 
-            // Leemos el contenido del jar
-            val texto = jarFile.getInputStream(configJson).bufferedReader()
+            // Comprobamos si hay un archivo de metadatos
+            if (configJson != null){
 
-            // Convertimos el texto a un archivo json
-            val json = Klaxon().parseJsonObject(texto)
+                // Leemos el contenido del jar
+                val texto = jarFile.getInputStream(configJson).bufferedReader()
 
-            println(json)
-
+                // Convertimos el json a un objeto [MetaPlugin]
+                val tempMetaPlugin = Klaxon().parse<MetaPlugin>(texto)
+                if (tempMetaPlugin!= null){
+                    metaPlugin = tempMetaPlugin
+                }
+            }
         }
     }
 }

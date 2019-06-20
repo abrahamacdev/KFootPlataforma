@@ -1,20 +1,18 @@
 package Controlador.Office
 
-import Controlador.Supervisor
-import Modelo.Plugin
-import Utiles.Constantes
+import Controlador.Supervisor.Supervisor
+import Modelo.Plugin.Plugin
 import Utiles.Utils
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.toObservable
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
 import java.util.concurrent.TimeUnit
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
-import kotlin.collections.ArrayList
+import IMain
 
 /**
  * Esta clase se encarga de toddo lo relacionado con los plugins
@@ -112,8 +110,10 @@ class Office: IOffice{
     /**
      * Cargamos todos los plugins válidos en memoria
      * para su posterior ejecución
+     *
+     * @param onPluginCargadoListener: Callback por el que pasaremos el plugin recien cargado
      */
-    override fun cargarPlugins(){
+    override fun cargarPlugins(onPluginCargadoListener: IMain.setOnPluginCargadoListener){
 
         // Obtenemos todos los jars del directorio de plugins
         val observableJars = Utils.obtenerJarsDirPlugins()
@@ -144,6 +144,14 @@ class Office: IOffice{
 
                         // Creamos un plugin con la ruta del jar y la clase principal
                         val plugin = Plugin(jar, clase)
+
+                        // Cargamos los metadatos del plugin
+                        plugin.cargarMetadatos()
+
+                        // Pasamos el plugin recién cargado
+                        onPluginCargadoListener.onPluginCargado(plugin)
+
+                        // Añadimos el plugin a la lista de los que se ejecutaran
                         Supervisor.instancia.anadirPlugin(plugin)
                     }
                 }
@@ -159,6 +167,15 @@ class Office: IOffice{
             // Terminamos de transmitir jars
             observer.onComplete()
         }
+    }
+
+    /**
+     * Llamamos al supervisor para que ejecute todos
+     * los plugins que se hallan cargado hasta el momendo
+     */
+    override fun ejecutarPlugins(): Supervisor {
+        Supervisor.instancia.ejecutarPlugins()
+        return Supervisor.instancia
     }
 
     /**

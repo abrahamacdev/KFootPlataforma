@@ -1,4 +1,4 @@
-package Modelo
+package Modelo.Plugin
 
 enum class EstadosPlugin {
     INACTIVO,       // El plugin no se esta ejcutando
