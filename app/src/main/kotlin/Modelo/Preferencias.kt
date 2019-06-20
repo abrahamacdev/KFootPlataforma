@@ -1,7 +1,7 @@
 package Modelo
 
-import Utiles.Constantes
-import Utiles.Utils
+import KFoot.Constantes as KFootConstantes
+import KFoot.Utils as KFootUtils
 import com.andreapivetta.kolor.Color
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.Key
@@ -49,7 +49,7 @@ object Preferencias{
         buffer.append("${k}=${v}\n")
         buffer.close()
 
-        Utils.debug(Constantes.DEBUG.DEBUG_TEST,"Se ha añadido al archivo de configuración: $k=$v", Color.LIGHT_BLUE)
+        KFootUtils.debug(KFootConstantes.DEBUG.DEBUG_TEST,"Se ha añadido al archivo de configuración: $k=$v", Color.LIGHT_BLUE)
 
     }
 
@@ -85,7 +85,7 @@ object Preferencias{
                     linea = k.name + "=" + v
                     modificado = true
 
-                    Utils.debug(Constantes.DEBUG.DEBUG_SIMPLE,"Se ha modificado una propiedad del archivo de configuración. Key = ${k.name}", Color.BLUE)
+                    KFootUtils.debug(KFootConstantes.DEBUG.DEBUG_SIMPLE,"Se ha modificado una propiedad del archivo de configuración. Key = ${k.name}", Color.BLUE)
 
                 }
             }

@@ -1,5 +1,5 @@
 import Controlador.Office.Office
-import Controlador.Setup
+import Controlador.Setup.Setup
 import Modelo.Plugin.Plugin
 import kotlinx.coroutines.*
 

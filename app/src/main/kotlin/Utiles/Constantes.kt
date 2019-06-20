@@ -1,11 +1,7 @@
 package Utiles
 
-import com.kscrap.libreria.Utiles.Constantes
-import com.kscrap.libreria.Utiles.Utils
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.stringType
-import java.io.File
-
 
 object Constantes {
 
@@ -14,27 +10,11 @@ object Constantes {
     val PRIMERA_VEZ_KEY = "YaEjecutado"
     // -------------------------------------------------------
 
-    // -- DEBUG --
-    enum class DEBUG(val value: Int) {
-        DEBUG_TEST(3),             // Nos permite seguir el flujo del programa al realizar tests
-        DEBUG_AVANZADO(2),         // Imprimirá mucha más información
-        DEBUG_SIMPLE(1),           // Imprimirá la información más básica
-        DEBUG_NONE(0),             // No queremos debug
-        DEBUG_LEVEL(DEBUG_TEST.value)    // Debug que queremos para la ejecución actual
-    }
-    // -----------------------------------------------
-
     // Nombre por defecto del directorio en el que se buscarán plugins
     val NOMBRE_DIRECTORIO_PLUGINS_DEFECTO = "/KScrapPlugins"
 
     // Directorio por defecto en el que se buscarán plugins
     var DIRECTORIO_PLUGINS = Modelo.Preferencias.getPropiedades().getOrNull(Key(RUTA_PLUGINS_KEY, stringType))
-
-    // Directorio personal del usuario
-    val DIRECTORIO_PERSONAL = System.getProperty("user.home").replace("\\","/")
-
-    // Directorio "Documentos" del usuario
-    val DIRECTORIO_DOCUMENTOS: String? = Utils.obtenerDirDocumentos()
 
     // Patrón que deben de seguir los comandos
     val REG_COMANDO = "(?:^[-]{1,2}[A-z0-9]+)(?:(?:[-][0-9A-z]+)*)\$"

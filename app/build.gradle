@@ -25,9 +25,6 @@ dependencies {
     // Habilitamos las coroutinas
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1"
 
-    // Logs con color
-    compile "com.andreapivetta.kolor:kolor:0.0.2"
-
     implementation 'com.beust:klaxon:5.0.1'
     
     // JDBC
@@ -40,7 +37,7 @@ dependencies {
     compile 'com.natpryce:konfig:1.6.10.0'
 
     // Librería KScrap
-    compile fileTree(dir: 'libs/KScrapLib', include: '*.jar')
+    compile fileTree(dir: 'libs/KFootUtils', include: '*.jar')
     
 }
 
