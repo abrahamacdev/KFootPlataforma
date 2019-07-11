@@ -13,6 +13,13 @@ import java.util.concurrent.TimeUnit
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import IMain
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import lib.Plugin.IPlugin
+import java.lang.reflect.Parameter
+import java.lang.reflect.Type
+import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * Esta clase se encarga de toddo lo relacionado con los plugins
@@ -23,26 +30,11 @@ import IMain
  */
 class Office: IOffice{
 
-    companion object {
+    private lateinit var supervisor: Supervisor
 
-        // Instancia del [Office]
-        val instancia: Office = Office();
-
-        /**
-         * Comprobamos que la plataforma se cierre correctamente,
-         * ejecutando las acciones oportunas para asegurar la integridad
-         */
-        @JvmStatic
-        @Synchronized
-        suspend fun cerrarAplicacion(forzado: Boolean = false){
-            // Esperamos 3 segundos antes de cerrar la aplicacion
-            Observable.timer(3, TimeUnit.SECONDS).subscribe({},{},{
-                System.exit(0)
-            })
-        }
+    constructor(){
+        supervisor = Supervisor()
     }
-
-    private constructor()
 
     /**
      * Comprobamos que halla plugins validos en el directorio
@@ -70,21 +62,8 @@ class Office: IOffice{
 
                 override fun onNext(jar: File) {
 
-                    // Recorremos cada uno de los elementos del jar
-                    val claseValida = JarFile(jar.absolutePath).stream()
-                            .filter{
-                                comprobarClaseValida(it)
-                            }
-                            .findFirst()
-
-                    // Si hay una clase válida, comprobamos que tenga los métodos necesarios
-                    if (claseValida.isPresent){
-
-                        // Cargamos el archivo .jar
-                        //val urlClassLoader: URLClassLoader = URLClassLoader.newInstance(arrayOf(URL("jar:file:${jar.absolutePath}!/")))
-
-                        // Cargamos la clase del .jar
-                        //val plugin = urlClassLoader.loadClass(claseValida.get().name.split(".")[0])
+                    // Comprobamos si el jar es un plugin valido
+                    if (comprobarPluginValido(jar)){
 
                         // Establecemos la existencia de plugins
                         hayPlugins = true
@@ -101,7 +80,6 @@ class Office: IOffice{
 
             // Recorremos cada uno de los .jar
             jarsObservable.subscribe(observer)
-            observer.onComplete()
         }
 
         return hayPlugins
@@ -113,7 +91,7 @@ class Office: IOffice{
      *
      * @param onPluginCargadoListener: Callback por el que pasaremos el plugin recien cargado
      */
-    override fun cargarPlugins(onPluginCargadoListener: IMain.setOnPluginCargadoListener){
+    override fun cargarPlugins(onPluginCargadoListener: IMain.setOnPluginCargadoListener?){
 
         // Obtenemos todos los jars del directorio de plugins
         val observableJars = Utils.obtenerJarsDirPlugins()
@@ -126,33 +104,25 @@ class Office: IOffice{
                 override fun onSubscribe(d: Disposable) {}
                 override fun onNext(jar: File) {
 
-                    // Recorremos cada uno de los elementos del jar
-                    val claseValida = JarFile(jar.absolutePath).stream()
-                            .filter{
-                                comprobarClaseValida(it)
-                            }
-                            .findFirst()
-
-                    // Si hay una clase válida, comprobamos que tenga los métodos necesarios
-                    if (claseValida.isPresent){
+                    // Comprobamos que el plguin  cumpla con los requisitos
+                    if (comprobarPluginValido(jar)){
 
                         // Cargamos el archivo .jar
                         val urlClassLoader: URLClassLoader = URLClassLoader.newInstance(arrayOf(URL("jar:file:${jar.absolutePath}!/")))
 
                         // Cargamos la primera clase válida que haya en el jar
-                        val clase = urlClassLoader.loadClass(claseValida.get().name.split(".")[0])
+                        val clase = urlClassLoader.loadClass("Main")
 
                         // Creamos un plugin con la ruta del jar y la clase principal
                         val plugin = Plugin(jar, clase)
 
-                        // Cargamos los metadatos del plugin
-                        plugin.cargarMetadatos()
-
                         // Pasamos el plugin recién cargado
-                        onPluginCargadoListener.onPluginCargado(plugin)
+                        if (onPluginCargadoListener != null){
+                            onPluginCargadoListener.onPluginCargado(plugin)
+                        }
 
                         // Añadimos el plugin a la lista de los que se ejecutaran
-                        Supervisor.instancia.anadirPlugin(plugin)
+                        supervisor.anadirPlugin(plugin)
                     }
                 }
 
@@ -163,9 +133,6 @@ class Office: IOffice{
 
             // Cargamos todos los plugins validos
             observableJars.subscribe(observer)
-
-            // Terminamos de transmitir jars
-            observer.onComplete()
         }
     }
 
@@ -174,25 +141,101 @@ class Office: IOffice{
      * los plugins que se hallan cargado hasta el momendo
      */
     override fun ejecutarPlugins(): Supervisor {
-        Supervisor.instancia.ejecutarPlugins()
-        return Supervisor.instancia
+        supervisor.ejecutarPlugins()
+        return supervisor
     }
 
     /**
-     * Comprobamos que el componente del jar sea una clase válida
+     * Comprobamos que el jar contenga los componentes necesarios
+     * para ser un plugin válido
      *
-     * @param componente: ELemento del jar a revisar
+     * @param jar: Archivo que presupuestamente es un plugin
      *
-     * @return Boolean: SI la clase es válida
+     * @return Boolean: Si el jar pasado es un plugin valido
      */
-    private fun comprobarClaseValida(componente: JarEntry): Boolean{
+    private fun comprobarPluginValido(jar: File): Boolean {
 
-        // Comprobamos que el componente sea una clase con nombre "[Mm]ain"
-        val reg = Regex("^[Mm]ain.class$")
+        // Componentes necesarios para ser considerado como plugin
+        var tieneArchConf = false
+        var tieneClasPrinc = false
 
-        // Comprobamos que la clase se encuentre en la raíz del jar
-        val enRaiz = componente.name.indexOf(47.toChar()) == -1
+        // Obtenemos el caracter de la barra inclinada
+        var barraInclinada = 47.toChar()
 
-        return componente.name.matches(reg) && enRaiz
+        // Secuencia de elementos que estan en la raíz del jar
+        val itemsEnRaiz = JarFile(jar).entries().asSequence().filter {
+            it.name.indexOf(barraInclinada) == -1
+        }
+
+        // Recorremos los elementos que estan en la raiz paea
+        // comprobar que el plugin tiene los requisitos necesarios
+        itemsEnRaiz.forEach {
+
+            val spliteado = it.name.split(".")
+            val extension = spliteado[spliteado.size - 1]
+
+            when {
+
+                // Es una clase
+                extension.equals("class") -> {
+
+                    if (esUnaClaseValida(it, jar)){
+                        tieneClasPrinc = true
+                    }
+                }
+
+                // Es un json
+                extension.equals("json") -> {
+
+                    // Comprobamos que el arrhivo se llame "config"
+                    if (spliteado[0].equals("config")){
+                        tieneArchConf = true
+                    }
+                }
+            }
+        }
+
+        return tieneClasPrinc && tieneArchConf
+    }
+
+    /**
+     * Comprobamos que la clase recibida por parametro
+     * cumple con las necesidades
+     *
+     * @param jarEntry: Elemento del jar analizado
+     * @param jarFile: Archivo jar que se esstá anlizando
+     *
+     * @return Boolean: Si la clase contiene los elementos necesarios
+     */
+    private fun esUnaClaseValida(jarEntry: JarEntry, jar: File): Boolean{
+
+        val nomClase = jarEntry.name.split(".")[0]
+
+        // Comprobamos que la clase se llame "Main"
+        if (nomClase.equals("Main")){
+
+            // Cargamos la clase "Main" del plugin
+            val classLoader = URLClassLoader.newInstance(arrayOf(URL("jar:file:${jar.absolutePath}!/")))
+            val clase = classLoader.loadClass(nomClase)
+
+            // Comprobemos que implemente la interfaz diseñada para la
+            // clase principal de los plugins
+            if (IPlugin::class.java in clase.interfaces){
+
+                // Método de sincronización
+                val metSinc = IPlugin::class.java.declaredMethods[0]
+
+                val existeMetSinc = clase.declaredMethods.firstOrNull {
+                    KFoot.Utils.sonElMismoMetodo(it,metSinc)
+                }
+
+                // Comprobamos que el método de sincronización existe en la clase
+                // principal del plugin
+                if (existeMetSinc != null){
+                    return true
+                }
+            }
+        }
+        return false
     }
 }

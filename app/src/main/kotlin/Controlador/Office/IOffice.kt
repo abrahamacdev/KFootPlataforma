@@ -2,6 +2,7 @@ package Controlador.Office
 
 import Controlador.Supervisor.Supervisor
 import IMain
+import java.io.File
 
 interface IOffice {
 
@@ -18,13 +19,7 @@ interface IOffice {
      *
      * @param onPluginCargadoListener: Callback por el que transmitiremos el plugin recien cargado
      */
-    fun cargarPlugins(onPluginCargadoListener: IMain.setOnPluginCargadoListener)
-
-    /**
-     * Llamamos al supervisor para que ejecute todos
-     * los plugins que se hallan cargado hasta el momendo
-     */
-    fun ejecutarPlugins(): Supervisor
+    fun cargarPlugins(onPluginCargadoListener: IMain.setOnPluginCargadoListener? = null)
 
     /**
      * Cargamos los plugins validos en memoria
@@ -33,4 +28,10 @@ interface IOffice {
      * @param pluginCargadoSub: Sujeto por el que transmitiremos el plugin recien cargado
      */
     /*fun cargarPlugins(pluginCargadoSub: PublishSubject<Plugin>)*/
+
+    /**
+     * Llamamos al supervisor para que ejecute todos
+     * los plugins que se hallan cargado hasta el momendo
+     */
+    fun ejecutarPlugins(): Supervisor
 }

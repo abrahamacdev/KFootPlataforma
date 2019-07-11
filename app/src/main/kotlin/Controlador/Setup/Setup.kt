@@ -1,6 +1,9 @@
 package Controlador.Setup
 
 import Controlador.Excepciones.ComandoException
+import KFoot.DEBUG
+import KFoot.IMPORTANCIA
+import KFoot.Logger
 import com.andreapivetta.kolor.Color
 import Utiles.Constantes
 import KFoot.Constantes as KFootConstantes
@@ -75,8 +78,8 @@ object Setup {
             // se guardan los plugins del archivo KScrap.properties
             f == null -> {
                 // Ruta actual de los plugins no válida
-                KFootUtils.debug(KFootConstantes.DEBUG.DEBUG_SIMPLE,"No se ha encontrado la ruta por defecto del directorio con los plugins. Se establecerá " +
-                        "el predeterminado en \'${KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO}\'",Color.RED)
+                Logger.getLogger().debug(DEBUG.DEBUG_SIMPLE,"No se ha encontrado la ruta por defecto del directorio con los plugins. Se establecerá " +
+                        "el predeterminado en \'${KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO}\'",IMPORTANCIA.ALTA)
 
                 // Estableceremos la ruta por defecto '/Documentos/KScrapPlugins
                 crearDirectorioPorDefecto()
@@ -86,8 +89,8 @@ object Setup {
             !f.isDirectory -> {
 
                 // Ruta actual de los plugins no válida
-                KFootUtils.debug(KFootConstantes.DEBUG.DEBUG_SIMPLE,"El actual directorio de los plugins no es válido, se establecerá " +
-                        "el predeterminado en \'${KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO}\'",Color.RED)
+                Logger.getLogger().debug(DEBUG.DEBUG_SIMPLE,"El actual directorio de los plugins no es válido, se establecerá " +
+                        "el predeterminado en \'${KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO}\'",IMPORTANCIA.ALTA)
 
                 // Estableceremos la ruta por defecto '/Documentos/KScrapPlugins
                 crearDirectorioPorDefecto()
@@ -96,8 +99,8 @@ object Setup {
             // No tenemos acceso al directorio
             !f.canRead() || !f.canExecute() || !f.canWrite() -> {
                 // Ruta actual de los plugins no válida
-                KFootUtils.debug(KFootConstantes.DEBUG.DEBUG_SIMPLE,"No se puede acceder al actual directorio de los plugins \'${f.absolutePath}\', " +
-                        "comprueba los permisos antes de continuar",Color.RED)// Ruta actual de los plugins no válida
+                Logger.getLogger().debug(DEBUG.DEBUG_SIMPLE,"No se puede acceder al actual directorio de los plugins \'${f.absolutePath}\', " +
+                        "comprueba los permisos antes de continuar",IMPORTANCIA.ALTA)
 
                 // Terminamos la ejecución
                 System.exit(1)

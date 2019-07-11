@@ -50,4 +50,25 @@ interface ISupervisor {
      */
     fun ejecutarPlugins()
 
+    /**
+     * Interfaz que usaremos para saber que plugins
+     * se han ejecutado correctamente y cuáles han sufrido
+     * algún error
+     */
+    interface onPluginEjecutado {
+
+        /**
+         * Se llamará una vez que el plugin se haya
+         * ejecutado correctamente
+         *
+         * @param plugin: Plugin que se ha ejecutado correctamente
+         */
+        fun onEjecutadoCorrectamente(plugin: Plugin)
+
+        /**
+         * Se llamará si el plugin no ha podido ejecutarse
+         * correctamente por algún error
+         */
+        fun onErrorEnEjecucion(plugin: Plugin)
+    }
 }

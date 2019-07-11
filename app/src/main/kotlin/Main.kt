@@ -1,6 +1,5 @@
 import Controlador.Office.Office
 import Controlador.Setup.Setup
-import Modelo.Plugin.Plugin
 import kotlinx.coroutines.*
 
 /**
@@ -17,22 +16,18 @@ fun main(args: Array<String>) = runBlocking<Unit> {
 
     // Obtenemos el office que se encargara de comprobar los plugins
     // existentes y de lanzarlos
-    val office = Office.instancia
+    val office = Office()
 
     // Si hay plugins validos, los cargaremos y ejecutaremos
     if(office.existenPlugins()){
 
         // Cargamos en memoria los plugins
-        office.cargarPlugins(object : IMain.setOnPluginCargadoListener{
-            override fun onPluginCargado(plugin: Plugin) {
-                println(plugin.getMetaDatos())
-            }
-        })
+        office.cargarPlugins()
 
         // Ejecutamos los plugins cargados
         val supervisor = office.ejecutarPlugins()
     }
 
-    // Se encarga de cerrar la aplicacion correctamente
-    Office.cerrarAplicacion()
+
+
 }

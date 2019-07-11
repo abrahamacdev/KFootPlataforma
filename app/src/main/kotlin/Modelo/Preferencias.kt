@@ -1,10 +1,14 @@
 package Modelo
 
+import KFoot.DEBUG
+import KFoot.IMPORTANCIA
+import KFoot.Logger
 import KFoot.Constantes as KFootConstantes
 import KFoot.Utils as KFootUtils
 import com.andreapivetta.kolor.Color
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.Key
+import lib.Common.Utiles.Utils
 import java.io.*
 
 object Preferencias{
@@ -49,7 +53,7 @@ object Preferencias{
         buffer.append("${k}=${v}\n")
         buffer.close()
 
-        KFootUtils.debug(KFootConstantes.DEBUG.DEBUG_TEST,"Se ha añadido al archivo de configuración: $k=$v", Color.LIGHT_BLUE)
+        Logger.getLogger().debug(DEBUG.DEBUG_TEST,"Se ha añadido al archivo de configuración: $k=$v", IMPORTANCIA.BAJA)
 
     }
 
@@ -85,7 +89,7 @@ object Preferencias{
                     linea = k.name + "=" + v
                     modificado = true
 
-                    KFootUtils.debug(KFootConstantes.DEBUG.DEBUG_SIMPLE,"Se ha modificado una propiedad del archivo de configuración. Key = ${k.name}", Color.BLUE)
+                    Logger.getLogger().debug(DEBUG.DEBUG_SIMPLE,"Se ha modificado una propiedad del archivo de configuración. Key = ${k.name}", IMPORTANCIA.MEDIA)
 
                 }
             }

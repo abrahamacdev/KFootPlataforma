@@ -1,23 +1,22 @@
 package Controlador.Supervisor
 
+import Modelo.Plugin.EstadosPlugin
 import Modelo.Plugin.Plugin
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * El [Supervisor] se encarga de gestionar toddo lo relacionado con
  * la ejecucion de los plugins y de la correcta ejecucion de estos
  */
-class Supervisor: ISupervisor {
+class Supervisor(): ISupervisor, ISupervisor.onPluginEjecutado {
 
     // Lista con los plugins a ejecutar
     private val plugins: ArrayList<Plugin> = ArrayList()
 
-    companion object {
+    // Lista con los plugins que han terminado de ejecutarse
+    private val pluginsCompletados: LinkedList<Plugin> = LinkedList()
 
-        // Instancia del [Supervisor]
-        val instancia: Supervisor = Supervisor()
-    }
-
-    private constructor()
 
 
     /**
@@ -60,7 +59,7 @@ class Supervisor: ISupervisor {
      *
      * @return List<Plugin>: Lista con los plugins que no pueden añadirse a la lista
      */
-    override fun anadirListaPlugins(listaPlugin: List<Plugin>): ArrayList<Plugin>{
+    override fun anadirListaPlugins(listaPlugins: List<Plugin>): ArrayList<Plugin>{
 
         // Lista con los plugins no validos
         val noValidos = ArrayList<Plugin>()
@@ -68,7 +67,7 @@ class Supervisor: ISupervisor {
 
         // Recorremos cada uno de los plugins que quieren
         // añadirse a la lista
-        listaPlugin.forEach {
+        listaPlugins.forEach {
 
                 // Si no se ha podido añadir el plugin a la lista de los que se
                 // ejecutara, lo añadimos a la lista de los no validos
@@ -81,22 +80,21 @@ class Supervisor: ISupervisor {
     }
 
 
-
     /**
      * Eliminamos de la lista el plugin que se
      * encuentra en la posición pasada por parámetro
      *
-     * @param indice: Posición del plugin a eliminar
+     * @param pos: Posición del plugin a eliminar
      *
      * @return Boolean: Si se ha eliminado
      */
-    override fun eliminarPlugin(indice: Int): Boolean{
+    override fun eliminarPlugin(pos: Int): Boolean{
 
         // TODO: Comprobar primero que el plugin no se este ejecutando
 
         // Comprobamos que el índice solicitado sea válido
-        if (indice >= 0 && indice < plugins.size){
-            plugins.removeAt(indice)
+        if (pos >= 0 && pos < plugins.size){
+            plugins.removeAt(pos)
             return true
         }
 
@@ -128,12 +126,25 @@ class Supervisor: ISupervisor {
     }
 
 
-
     /**
      * Ejecutamos todos los plugins que se encuentren en la lista,
      * cada uno en una coroutina separada
      */
     override fun ejecutarPlugins() {
-        plugins.forEach { it.activar() }
+
+        // Activamos todos los plugins que estén inactivos
+        plugins.filter { it.getEstadoActual() == EstadosPlugin.INACTIVO }.forEach{ it.activar(this) }
+    }
+
+
+
+
+    override fun onEjecutadoCorrectamente(plugin: Plugin) {
+        pluginsCompletados.add(plugin)
+    }
+
+    // TODO: Completar el funcionamiento del método
+    override fun onErrorEnEjecucion(plugin: Plugin) {
+        pluginsCompletados.add(plugin)
     }
 }

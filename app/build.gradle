@@ -36,8 +36,8 @@ dependencies {
     // Preferencias Simples
     compile 'com.natpryce:konfig:1.6.10.0'
 
-    // Librería KScrap
-    compile fileTree(dir: 'libs/KFootUtils', include: '*.jar')
+    // Utiles de la libreria KFoot
+    compile fileTree(dir: 'libs/KFootLib', include: '*.jar')
     
 }
 
