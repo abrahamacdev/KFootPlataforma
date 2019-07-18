@@ -1,5 +1,5 @@
-
 -- 1 --
-Para que un plugin se válido, debe de tener una clase "[Mm]ain" en el directorio
-raíz del jar.
+Para que un plugin sea válido necesita tener una clase "Main" en la raíz del jar del plugin que implemente la interfaz
+"IPlugin.kt" (esta interfaz se encuentra en la librería "KFootLib")
 -------
+

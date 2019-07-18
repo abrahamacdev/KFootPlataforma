@@ -5,16 +5,14 @@ import KFoot.IMPORTANCIA
 import KFoot.Logger
 import KFoot.Constantes as KFootConstantes
 import KFoot.Utils as KFootUtils
-import com.andreapivetta.kolor.Color
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.Key
-import lib.Common.Utiles.Utils
 import java.io.*
 
 object Preferencias{
 
     private var propiedades: ConfigurationProperties? = null
-    private val RUTA_ARCHIVO = File("app/src/main/resources/KScrap.properties")
+    private val RUTA_ARCHIVO = File("app/src/Vista.main/resources/KScrap.properties")
 
     fun getPropiedades(): ConfigurationProperties{
         return obtenerPropiedades()

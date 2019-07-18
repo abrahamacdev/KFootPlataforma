@@ -1,10 +1,9 @@
-package Controlador.Setup
+package Controlador
 
 import Controlador.Excepciones.ComandoException
 import KFoot.DEBUG
 import KFoot.IMPORTANCIA
 import KFoot.Logger
-import com.andreapivetta.kolor.Color
 import Utiles.Constantes
 import KFoot.Constantes as KFootConstantes
 import KFoot.Utils as KFootUtils
@@ -34,7 +33,7 @@ object Setup {
         // Aplicamos los argumentos pasados por parámetros
         if (args.size > 0){
             // Lista de comando con sus argumentos
-            val argumentos = parsearComandos(args)
+            val argumentos = Controlador.Setup.parsearComandos(args)
 
             // Observable con la lista de comandos
             val observable = argumentos.toObservable()
@@ -46,7 +45,7 @@ object Setup {
                 }
 
                 override fun onNext(t: String) {
-                    aplicarCambios(t, this)
+                    Controlador.Setup.aplicarCambios(t, this)
                 }
 
                 override fun onError(e: Throwable) {
@@ -56,11 +55,11 @@ object Setup {
         }
 
         // Comprobamos si se está ejecutando por primera vez el programa
-        if (esPrimeraVez()){
+        if (Controlador.Setup.esPrimeraVez()){
 
             // Comprobamos si no hay ninguna ruta del directorio de plugins establecida
             if (Modelo.Preferencias.getPropiedades().getOrNull(Key(Constantes.RUTA_PLUGINS_KEY, stringType)) == null && Constantes.DIRECTORIO_PLUGINS == null){
-                crearDirectorioPorDefecto()
+                Controlador.Setup.crearDirectorioPorDefecto()
             }
 
             // Primera ejecución del programa realizada
@@ -82,7 +81,7 @@ object Setup {
                         "el predeterminado en \'${KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO}\'",IMPORTANCIA.ALTA)
 
                 // Estableceremos la ruta por defecto '/Documentos/KScrapPlugins
-                crearDirectorioPorDefecto()
+                Controlador.Setup.crearDirectorioPorDefecto()
             }
 
             // La ruta del directorio de los plugins no es válida
@@ -93,7 +92,7 @@ object Setup {
                         "el predeterminado en \'${KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO}\'",IMPORTANCIA.ALTA)
 
                 // Estableceremos la ruta por defecto '/Documentos/KScrapPlugins
-                crearDirectorioPorDefecto()
+                Controlador.Setup.crearDirectorioPorDefecto()
             }
 
             // No tenemos acceso al directorio

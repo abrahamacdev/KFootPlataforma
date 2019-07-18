@@ -9,17 +9,10 @@ import io.reactivex.disposables.Disposable
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
-import java.util.concurrent.TimeUnit
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
-import IMain
-import io.reactivex.Scheduler
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
+import Vista.IMain
 import lib.Plugin.IPlugin
-import java.lang.reflect.Parameter
-import java.lang.reflect.Type
-import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * Esta clase se encarga de toddo lo relacionado con los plugins

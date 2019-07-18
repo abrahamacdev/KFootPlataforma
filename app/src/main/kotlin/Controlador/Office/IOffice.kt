@@ -1,8 +1,7 @@
 package Controlador.Office
 
 import Controlador.Supervisor.Supervisor
-import IMain
-import java.io.File
+import Vista.IMain
 
 interface IOffice {
 

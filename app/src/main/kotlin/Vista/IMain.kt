@@ -1,4 +1,4 @@
-
+package Vista
 interface IMain {
 
     interface setOnPluginCargadoListener {
