@@ -9,5 +9,11 @@ interface IMain {
          * @param plugin: Plugin recién cargado
          */
         fun onPluginCargado(plugin: Modelo.Plugin.Plugin)
+
+        /**
+         * Este método se llamará una vez que se hayan cargado
+         * todos los plugins válidos
+         */
+        fun onCompletado()
     }
 }

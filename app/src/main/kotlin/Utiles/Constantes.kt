@@ -24,5 +24,4 @@ object Constantes {
 
     // Patrón completo que comprueba si hay un comando y su respectivo argumento (opcional)
     //val REG_COMANDO_COMPLETO = "(?:^[-]{1,2}[A-z0-9]+)(?:(?:[-][0-9A-z]+)*)(?:\$|\\s[A-z0-9]+\$)"
-
 }

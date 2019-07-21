@@ -12,7 +12,8 @@ import java.io.*
 object Preferencias{
 
     private var propiedades: ConfigurationProperties? = null
-    private val RUTA_ARCHIVO = File("app/src/Vista.main/resources/KScrap.properties")
+    private val RUTA_ARCHIVO = javaClass.getResource("../preferencias/").toString()
+    private val NOMBRE_ARCHIVO = "KScrap.properties"
 
     fun getPropiedades(): ConfigurationProperties{
         return obtenerPropiedades()
@@ -28,12 +29,19 @@ object Preferencias{
 
         // Aún no está cargado
         if (propiedades == null){
+
+            val f = File(RUTA_ARCHIVO + NOMBRE_ARCHIVO)
+
+            println(File(RUTA_ARCHIVO).setReadable(true))
+            println(File(RUTA_ARCHIVO).canRead())
+            println(File(RUTA_ARCHIVO).canWrite())
+
             // Comprobamos que el archivo exista y lo cargamos a la variable
-            if (!RUTA_ARCHIVO.exists() || !RUTA_ARCHIVO.isFile){
+            if (!f.exists() || !f.isFile){
                 // Creamos el archivo
-                FileWriter(RUTA_ARCHIVO).close()
+                FileWriter(f).close()
             }
-            propiedades = ConfigurationProperties.fromFile(RUTA_ARCHIVO)
+            propiedades = ConfigurationProperties.fromFile(f)
         }
 
         return propiedades!!
@@ -47,7 +55,7 @@ object Preferencias{
     fun <T> add(k: String, v: T){
 
         // Creamos el archivo
-        val buffer: BufferedWriter = BufferedWriter(FileWriter(RUTA_ARCHIVO, true))
+        val buffer: BufferedWriter = BufferedWriter(FileWriter(RUTA_ARCHIVO + NOMBRE_ARCHIVO, true))
         buffer.append("${k}=${v}\n")
         buffer.close()
 
@@ -73,7 +81,7 @@ object Preferencias{
 
         // Leemos el contenido del archivo de configuración en busca
         // de la "key" necesitada.
-        val reader = BufferedReader(FileReader(RUTA_ARCHIVO))
+        val reader = BufferedReader(FileReader(RUTA_ARCHIVO + NOMBRE_ARCHIVO))
         reader.forEachLine {
 
             var linea = ""
@@ -101,7 +109,7 @@ object Preferencias{
         // Escribimos los nuevos ajustes en el documento
         if (!nuevoDocumento.isEmpty()){
 
-            val writer = BufferedWriter(FileWriter(RUTA_ARCHIVO))
+            val writer = BufferedWriter(FileWriter(RUTA_ARCHIVO + NOMBRE_ARCHIVO))
             writer.write(nuevoDocumento)
             writer.close()
         }

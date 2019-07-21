@@ -1,3 +1,4 @@
+/* Contenedor Principal */
 .main {
 	-fx-pref-width: 1200.0;
     -fx-pref-height: 800.0;
@@ -9,7 +10,10 @@
     -fx-background-radius: 0 0 0 0;
     -fx-border-radius: 0 0 0 0;
 }
+/* -------------- */
 
+
+/* Menú */
 .lista-botones-menu {
 	-fx-pref-width: 200;
     -fx-pref-height: 600;
@@ -27,7 +31,6 @@
 }
 
 .boton-menu {
-    -fx-background-color: TRANSPARENT;
     -fx-text-fill: #000000;
     -fx-font-size: 15;
 	-fx-padding: 0 0 0 50;
@@ -42,6 +45,14 @@
     -fx-graphic-text-gap: 15;
 }
 
+.boton-menu-normal {
+    -fx-background-color: TRANSPARENT;
+}
+
+.boton-menu-pulsado {
+    -fx-background-color: #ffc153;
+}
+
 .boton-menu.apagar {
     -fx-background-color: #eb6b56;
     -fx-pref-width: 200;
@@ -53,9 +64,10 @@
     -fx-background-radius: 0 0 0 70;
     -fx-border-radius: 0 0 0 70;
 }
+/* -------------- */
 
-.imagen-boton {}
 
+/* Contenedor del fragmento central */
 .contenedor-fragmento {
     -fx-translate-x: 200.0;
     -fx-pref-width: 600;
@@ -68,7 +80,9 @@
     -fx-background-radius: 20 20 20 20;
     -fx-border-radius: 20 20 20 20;
 }
+/* -------------- */
 
+/* Spinner de carga */
 .spinner-main .arc{
     -fx-stroke: #eb6b56;
 }
@@ -77,3 +91,18 @@
     -fx-font-family: 'Arial';
     -fx-font-size: 16 ;
 }
+/* -------------- */
+
+/* Plugins */
+.layout-detalle-plugin {
+    -fx-background-radius: 10 10 10 10;
+    -fx-border-radius: 10 10 10 10;
+    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.8), 20, 0, 0, 5);
+    -fx-background-color: #000000;
+}
+
+.texto-nombre-plugin {
+
+}
+/* -------------- */
+
