@@ -1,5 +1,6 @@
 package Vista
 
+import Controlador.Setup
 import Controlador.UI.Main.MainController
 import javafx.application.Application
 import javafx.stage.Stage
@@ -35,18 +36,18 @@ class Main(): Application() {
 
     override fun start(primaryStage: Stage?) {
 
+        // Realizamos las comprobaciones iniciales del programa
+        Setup.realizarComprobaciones()
+
         // Creamos el controlador de la clase principal
         mainController = MainController(this, primaryStage!!)
 
         // Mostramos la pantalla inicial de la plataforma
         mainController.mostrarLayoutInicial()
 
-        // Realizamos las comprobaciones iniciales del programa
-        /*Setup.realizarComprobaciones(args)
-
         // Obtenemos el office que se encargara de comprobar los plugins
         // existentes y de lanzarlos
-        val office = Office()
+        /*val office = Office()
 
         // Si hay plugins validos, los cargaremos y ejecutaremos
         if(office.existenPlugins()){

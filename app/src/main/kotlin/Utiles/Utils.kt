@@ -1,5 +1,6 @@
 package Utiles
 
+import Modelo.Preferencias
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.toObservable
 import javafx.scene.paint.Color
@@ -139,4 +140,9 @@ data class Colar(val r: Int,
                  val g: Int,
                  val b: Int) {
     constructor(color: Color): this(color.red.toInt(),color.green.toInt(),color.blue.toInt())
+}
+
+enum class POSICION{
+    DERECHA,
+    IZQUIERDA
 }

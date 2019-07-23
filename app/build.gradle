@@ -32,11 +32,11 @@ dependencies {
     // Acceso a SQLite
     //compile 'org.jetbrains.exposed:exposed:0.13.2'
 
-    // Preferencias Simples
-    compile 'com.natpryce:konfig:1.6.10.0'
-
     // Utiles de la libreria KFoot
     compile fileTree(dir: 'libs/KFootLib', include: '*.jar')
+
+    // Cargador de imagenes SVG
+    compile fileTree(dir: 'libs/JavaFXSvg', include: '*.jar')
 
     // JavaFX
     compile fileTree(dir: 'libs/JavaFX', include: '*.jar')

@@ -4,12 +4,10 @@ import Controlador.Excepciones.ComandoException
 import KFoot.DEBUG
 import KFoot.IMPORTANCIA
 import KFoot.Logger
+import Modelo.Preferencias
 import Utiles.Constantes
 import KFoot.Constantes as KFootConstantes
 import KFoot.Utils as KFootUtils
-import com.natpryce.konfig.Key
-import com.natpryce.konfig.booleanType
-import com.natpryce.konfig.stringType
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.toObservable
@@ -24,14 +22,22 @@ object Setup {
      *
      * @param Array<String> args: Argumentos pasados por la línea de comandos
      */
-    fun realizarComprobaciones(args: Array<String>){
+    fun realizarComprobaciones(args: Array<String>? = null){
 
-        // Creamos el documentos con las propiedades del programa
-        // si no existe, sino lo cargaremos en memoria
-        Modelo.Preferencias.getPropiedades()
+        // Comprobamos si se está ejecutando por primera vez el programa
+        if (Setup.esPrimeraVez()){
+
+            // Comprobamos si no hay ninguna ruta del directorio de plugins establecida
+            if (Preferencias.obtenerOrNulo(Constantes.RUTA_PLUGINS_KEY) == null && Constantes.DIRECTORIO_PLUGINS == null){
+                Controlador.Setup.crearDirectorioPorDefecto()
+            }
+
+            // Primera ejecución del programa realizada
+            Preferencias.anadir(Constantes.PRIMERA_VEZ_KEY, true)
+        }
 
         // Aplicamos los argumentos pasados por parámetros
-        if (args.size > 0){
+        if (args != null && args.size > 0){
             // Lista de comando con sus argumentos
             val argumentos = Controlador.Setup.parsearComandos(args)
 
@@ -53,19 +59,6 @@ object Setup {
                 }
             })
         }
-
-        // Comprobamos si se está ejecutando por primera vez el programa
-        if (Controlador.Setup.esPrimeraVez()){
-
-            // Comprobamos si no hay ninguna ruta del directorio de plugins establecida
-            if (Modelo.Preferencias.getPropiedades().getOrNull(Key(Constantes.RUTA_PLUGINS_KEY, stringType)) == null && Constantes.DIRECTORIO_PLUGINS == null){
-                Controlador.Setup.crearDirectorioPorDefecto()
-            }
-
-            // Primera ejecución del programa realizada
-            Modelo.Preferencias.add(Constantes.PRIMERA_VEZ_KEY, true)
-        }
-
 
         // Comprobamos la integridad del directorio en el que se encuentran
         // los plugins
@@ -113,11 +106,7 @@ object Setup {
      * @return Boolean: Si ya lo  hemos ejecutado anteriormente
      */
     private fun esPrimeraVez(): Boolean{
-        val propiedades = Modelo.Preferencias.getPropiedades()
-        val primeraVez = Key("YaEjecutado", booleanType)
-
-        // Es la primera vez que lo ejecutamos
-        return propiedades.getOrNull(primeraVez) == null
+        return Preferencias.obtenerOrNulo("YaEjecutado") == null
     }
 
     /**
@@ -141,7 +130,7 @@ object Setup {
             directorioPlugins.mkdir()
 
             // Si se ha creado el directorio, lo guardamos en el archivo de configuración
-            Modelo.Preferencias.add(Constantes.RUTA_PLUGINS_KEY, KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO)
+            Preferencias.anadir(Constantes.RUTA_PLUGINS_KEY, KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO)
 
             // Guardamos la ruta del directorio en memoria
             Constantes.DIRECTORIO_PLUGINS = KFootUtils.obtenerDirDocumentos() + Constantes.NOMBRE_DIRECTORIO_PLUGINS_DEFECTO
@@ -221,10 +210,10 @@ object Setup {
                     if (f.isDirectory && f.exists()){
 
                         // Creamos la key
-                        val key = Key(Constantes.RUTA_PLUGINS_KEY, stringType)
+                        val key = Constantes.RUTA_PLUGINS_KEY
 
                         // Actualizamos la ruta en la que buscaremos los plugins en el archivo de confiruación
-                        Modelo.Preferencias.modify(key,f.absolutePath, true)
+                        Preferencias.modificar(key,f.absolutePath)
                         Constantes.DIRECTORIO_PLUGINS = f.absolutePath
 
                         return

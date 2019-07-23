@@ -3,13 +3,10 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import java.lang.String?>
 <?import java.net.URL?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
@@ -19,9 +16,9 @@
          <children>
             <Button id="botonPlugins" alignment="BASELINE_LEFT" mnemonicParsing="false" prefWidth="146.0" style="-fx-background-radius: 20 0 0 0; -fx-border-radius: 20 0 0 0;" text="Plugins">
                <graphic>
-                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" styleClass="imagen-boton">
+                  <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="imagen-boton">
                      <image>
-                        <Image url="@../imagenes/bow2.png" />
+                        <Image url="@../imagenes/bow.png" />
                      </image>
                   </ImageView>
                </graphic>
@@ -32,9 +29,9 @@
             </Button>
             <Button id="botonAjustes" alignment="BASELINE_LEFT" mnemonicParsing="false" prefWidth="146.0" text="Ajustes">
                <graphic>
-                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" styleClass="imagen-boton">
+                  <ImageView fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="imagen-boton">
                      <image>
-                        <Image url="@../imagenes/settings2.png" />
+                        <Image url="@../imagenes/settings.png" />
                      </image>
                   </ImageView>
                </graphic>
@@ -45,11 +42,7 @@
             </Button>
             <Button id="botonCuenta" alignment="BASELINE_LEFT" mnemonicParsing="false" prefWidth="146.0" text="Cuenta">
                <graphic>
-                  <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" styleClass="imagen-boton">
-                     <image>
-                        <Image url="@../imagenes/boy.png" />
-                     </image>
-                  </ImageView>
+                  <ImageView fx:id="imagenMenuCuenta" fitHeight="35.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true" styleClass="imagen-boton" />
                </graphic>
                <styleClass>
                   <String fx:value="boton-menu" />
@@ -65,7 +58,7 @@
             </JFXButton>
          </children>
       </VBox>
-      <AnchorPane id="fragmentoPrincipal" fx:id="fragmento" prefHeight="200.0" prefWidth="200.0" styleClass="contenedor-fragmento" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="230.0" AnchorPane.topAnchor="30.0"/>
+      <AnchorPane id="fragmentoPrincipal" fx:id="fragmento" prefHeight="200.0" prefWidth="200.0" styleClass="contenedor-fragmento" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="230.0" AnchorPane.topAnchor="30.0" />
    </children>
    <stylesheets>
       <URL value="@../css/estilosPlataforma.css" />

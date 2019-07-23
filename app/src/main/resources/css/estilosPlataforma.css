@@ -32,17 +32,15 @@
 
 .boton-menu {
     -fx-text-fill: #000000;
-    -fx-font-size: 15;
-	-fx-padding: 0 0 0 50;
+    -fx-font: 1.7em Arial;
+	-fx-padding: 0 0 0 35;
     -fx-pref-width: 200;
-    -fx-pref-height: 65;
+    -fx-pref-height: 80;
     -fx-min-width: 200;
-    -fx-min-height: 65;
+    -fx-min-height: 80;
     -fx-max-width: 200;
-    -fx-max-height: 65;
-    -fx-font-family: 'Arial';
-    -fx-font-size: 16;
-    -fx-graphic-text-gap: 15;
+    -fx-max-height: 80;
+    -fx-graphic-text-gap: 16;
 }
 
 .boton-menu-normal {
@@ -94,15 +92,45 @@
 /* -------------- */
 
 /* Plugins */
-.layout-detalle-plugin {
-    -fx-background-radius: 10 10 10 10;
-    -fx-border-radius: 10 10 10 10;
-    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.8), 20, 0, 0, 5);
-    -fx-background-color: #000000;
+.fondo-contenedores-plugins {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+   -fx-background-color: transparent;
+}
+
+.scroll-pane {
+   -fx-background-color: transparent;
+}
+
+.layout-detalle-plugin-base {
+    -fx-background-radius: 20 20 20 20;
+    -fx-border-radius: 20 20 20 20;
+    /*-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);*/
+    /*-fx-background-color: #000000;*/
+    -fx-background-color: transparent;
+    -fx-border-insets: 30 30 10 30;
+    -fx-background-insets: 30 30 10 30;
 }
 
 .texto-nombre-plugin {
+    -fx-fill: #ffffff;
+    -fx-font: 2em Arial;
+    -fx-font-weight: bold;
+}
 
+.texto-version-plugin {
+    -fx-fill: #ffffff;
+    -fx-font: 1.5em Arial;
+}
+
+.boton-ejecutar-plugin {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(255, 255, 255, 0.8);
+    -fx-text-fill: #ffffff;
+    -fx-border-width: 1;
+    -fx-background-insets: 0;
 }
 /* -------------- */
 

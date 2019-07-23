@@ -2,6 +2,7 @@ package Controlador.UI.Main
 
 import Controlador.UI.IController
 import Controlador.UI.Plugins.PluginsController
+import Utiles.Constantes
 import Vista.Main
 import com.jfoenix.controls.JFXButton
 import com.jfoenix.svg.SVGGlyphLoader
@@ -12,11 +13,18 @@ import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.Button
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
+import javafx.stage.Screen
 import javafx.stage.Stage
 import javafx.stage.StageStyle
+import java.awt.Toolkit
+import java.io.File
+import sun.misc.ClassLoaderUtil
+import sun.security.util.Resources
 
 
 class MainController(private val main: Main, private val etapa: Stage): IMainController, EventHandler<MouseEvent>{
@@ -36,16 +44,8 @@ class MainController(private val main: Main, private val etapa: Stage): IMainCon
     // Controlador que esta ocupando actualmente el #fragmentoPrincipal
     private var controladorFragmento: IController? = null
 
-    // Nos permitirá arrastrar la ventana en caso de no
-    // querer los marcos que añade el SO a la ventana
-    private var xOffset: Double = -1.0
-    private var yOffset: Double = -1.0
-
-    companion object {
-
-        // Nos permitirá saber si hemos eliminado los bordes de la ventana
-        private var bordesEliminados = false
-    }
+    // Ruta de las imagenes disponibles para la sección "Cuenta" del menú
+    private val  rutasImagenesMenuCuenta: Array<String> = arrayOf(javaClass.getResource("../../../imagenes/account1.png").toString(),javaClass.getResource("../../../imagenes/account2.png").toString())
 
 
 
@@ -57,13 +57,6 @@ class MainController(private val main: Main, private val etapa: Stage): IMainCon
         // Creamos una escena a partir del layout principal
         escena = Scene(mainLayout)
 
-        // Comenzamos el programa cargando los plugins válidos
-        cambiarLayoutFragmento(PluginsController())
-        val botonPlugins = escena.lookup("#botonPlugins") as Button
-        botonPlugins.styleClass.remove("")
-        botonPlugins.styleClass.remove("boton-menu-normal")
-        botonPlugins.styleClass.add("boton-menu-pulsado")
-
         // Cargamos el botón de apagado
         cargarBotonApagado()
 
@@ -73,12 +66,25 @@ class MainController(private val main: Main, private val etapa: Stage): IMainCon
         // Establecemeos la escena a la etapa principal
         etapa.setScene(escena)
 
+        // Mostramos el layout en pantalla completa
+        etapa.isMaximized = true
+
         // Atendemos los clicks de los botones del menú
         botonesMenu.addAll((mainLayout.lookup("#menu") as  VBox).children.filter { it is Button && !it.styleClass.contains("jfx-button")} as Collection<Button>)
         botonesMenu.forEach { (it as Button).onMouseClicked = this }
 
-        // Mostramos el layout
+        // Cargamos la imagen del menu (Cuenta)
+        cargarImagenMenuCuenta()
+
+        // Mostramos el layout principal
         etapa.show()
+
+        // Cargamos plugins válidos
+        cambiarLayoutFragmento(PluginsController())
+        val botonPlugins = escena.lookup("#botonPlugins") as Button
+        botonPlugins.styleClass.remove("")
+        botonPlugins.styleClass.remove("boton-menu-normal")
+        botonPlugins.styleClass.add("boton-menu-pulsado")
     }
 
 
@@ -107,12 +113,35 @@ class MainController(private val main: Main, private val etapa: Stage): IMainCon
     }
 
     /**
+     * Cargamos la imagen del apartado "Cuenta" del menú
+     * lateral
+     */
+    private fun cargarImagenMenuCuenta(){
+
+        val posIcono = Math.round(Math.random()).toInt()
+
+        val botonAjustes = botonesMenu.first { it.id.equals("botonAjustes") }
+        val botonCuenta = botonesMenu.first { it.id.equals("botonCuenta") }
+        val imagen = ImageView(rutasImagenesMenuCuenta.get(posIcono))
+        imagen.isPreserveRatio = true
+        imagen.fitHeight = botonAjustes.graphic.prefHeight(-1.0)
+        imagen.fitWidth = botonAjustes.graphic.prefWidth(-1.0)
+        botonCuenta.graphic = imagen
+    }
+
+    /**
      * Le establecemos un tamaño mínimo a la ventana para
      * que esta no tome una forma extraña
      */
     private fun establecerTamanioMin(){
-        etapa.minWidth = 900.0
-        etapa.minHeight= 600.0
+
+        val tamanioPantalla = Screen.getPrimary().visualBounds
+
+        val tempWidth = tamanioPantalla.width / 5 * 4
+        val tempHeight = tamanioPantalla.getWidth() / 5 * 2
+
+        etapa.minWidth = if (tempWidth < Constantes.ANCHO_MINIMO) Constantes.ANCHO_MINIMO else tempWidth
+        etapa.minHeight = if (tempHeight < Constantes.ALTO_MINIMO) Constantes.ALTO_MINIMO else tempHeight
     }
 
     override fun handle(event: MouseEvent?) {
@@ -185,7 +214,9 @@ class MainController(private val main: Main, private val etapa: Stage): IMainCon
                 controladorFragmento!!.cancelar()
             }
 
-            println("Cambiamos el fragmento por el de los plugins")
+            if (fragmentoPrincipal.children.size > 0){
+                fragmentoPrincipal.children.removeAt(0)
+            }
 
             // Iniciamos el nuevo controlador del fragmento
             controladorFragmento = nuevoControllFrag
