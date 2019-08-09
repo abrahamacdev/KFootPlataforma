@@ -32,7 +32,7 @@
 
 .boton-menu {
     -fx-text-fill: #000000;
-    -fx-font: 1.7em Arial;
+    -fx-font: 1.5em Arial;
 	-fx-padding: 0 0 0 35;
     -fx-pref-width: 200;
     -fx-pref-height: 80;
@@ -134,3 +134,39 @@
 }
 /* -------------- */
 
+
+/* Ajustes */
+.texto-ajustes {
+    -fx-fill: #3A3A3A;
+    /*-fx-font: 1.4em 'Fira Sans ExtraBold';*/
+    -fx-font: 1.6em 'Josefin Sans Regular';
+}
+
+.input-ajustes {
+    /*-fx-font: 1.4em 'Fira Sans ExtraBold';*/
+    -fx-font: 1.2em 'Josefin Sans Regular';
+}
+
+.contenedor-ajuste {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 0);
+    -fx-background-color: #ffffff;
+}
+
+.boton-elegir-dir-plugins {
+    -fx-background-color: #eb6b56;   
+    -fx-fill: #ffffff;
+    -fx-font: bold 1em 'Arial';
+}
+
+.scroll-ajustes {
+    -fx-background-color: #FCFCFC;
+    -fx-background-radius: 20 20 20 20;
+    -fx-border-radius: 20 20 20 20;
+}
+
+.boton-aplicar-cambios {
+    -fx-background-color: #47b39d;   
+    -fx-text-fill: #ffffff;
+    -fx-font: bold 1.2em 'Arial';
+}
+/* -------------- */

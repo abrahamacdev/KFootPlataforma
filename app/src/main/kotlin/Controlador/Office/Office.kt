@@ -11,7 +11,7 @@ import java.net.URL
 import java.net.URLClassLoader
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
-import Vista.IMain
+import Vista.Main.IMainView
 import lib.Plugin.IPlugin
 
 /**
@@ -55,6 +55,7 @@ class Office: IOffice{
 
                 override fun onNext(jar: File) {
 
+
                     // Comprobamos si el jar es un plugin valido
                     if (comprobarPluginValido(jar)){
 
@@ -84,7 +85,7 @@ class Office: IOffice{
      *
      * @param onPluginCargadoListener: Callback por el que pasaremos el plugin recien cargado
      */
-    override fun cargarPlugins(onPluginCargadoListener: IMain.setOnPluginCargadoListener?){
+    override fun cargarPlugins(onPluginCargadoListener: IOffice.onPluginCargadoListener?){
 
         // Obtenemos todos los jars del directorio de plugins
         val observableJars = Utils.obtenerJarsDirPlugins()
@@ -204,10 +205,10 @@ class Office: IOffice{
 
         val nomClase = jarEntry.name.split(".")[0]
 
-        // Comprobamos que la clase se llame "Main"
+        // Comprobamos que la clase se llame "MainView"
         if (nomClase.equals("Main")){
 
-            // Cargamos la clase "Main" del plugin
+            // Cargamos la clase "MainView" del plugin
             val classLoader = URLClassLoader.newInstance(arrayOf(URL("jar:file:${jar.absolutePath}!/")))
             val clase = classLoader.loadClass(nomClase)
 

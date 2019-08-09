@@ -36,7 +36,7 @@ dependencies {
     compile fileTree(dir: 'libs/KFootLib', include: '*.jar')
 
     // Cargador de imagenes SVG
-    compile fileTree(dir: 'libs/JavaFXSvg', include: '*.jar')
+    compile 'com.github.afester.javafx:FranzXaver:0.1'
 
     // JavaFX
     compile fileTree(dir: 'libs/JavaFX', include: '*.jar')

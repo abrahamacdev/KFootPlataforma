@@ -30,7 +30,7 @@ class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope, IPlu
     // de la correcta/erronea ejecucion del plugin
     private var resultadoEjecucionListener: ISupervisor.onPluginEjecutado? = null
 
-    // Tarea vinculada al Plugin y contexto de la coroutina
+    // Tarea vinculada al PluginView y contexto de la coroutina
     private val job = SupervisorJob()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default + job
@@ -73,7 +73,7 @@ class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope, IPlu
     }
 
     override fun toString(): String {
-        var msg = "(Plugin) Id: $ID. "
+        var msg = "(PluginView) Id: $ID. "
 
         if (metadatosPlugin != null){
            msg += "Nombre: ${metadatosPlugin!!.nombrePlugin}"

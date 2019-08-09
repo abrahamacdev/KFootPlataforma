@@ -1,9 +1,26 @@
 package Controlador.UI.Main
 
-interface IMainController {
+import Controlador.UI.IController
+import javafx.event.EventHandler
+import javafx.scene.control.Button
+import javafx.scene.input.MouseEvent
+
+interface IMainController: IController {
 
     /**
-     * Mostramos el layout principal de la plataforma
+     * Retornamos la ruta absoluta de la imagen
+     * que se usará como icono para la opción "cuenta"
+     * del menú principal
+     *
+     * @return String: Ruta a utilizar
      */
-    fun mostrarLayoutInicial()
+    fun obtenerRutaImagenCuenta(): String
+
+    /**
+     * Establecemos los listeners de los botones del
+     * menú principal
+     *
+     * @return EventHandler<MouseEvent>: Listener asociado al botón
+     */
+    fun getMenuClickListener(): EventHandler<MouseEvent>
 }

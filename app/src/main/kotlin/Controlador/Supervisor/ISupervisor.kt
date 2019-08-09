@@ -7,7 +7,7 @@ interface ISupervisor {
      * Añadimos el plugin pasado por parámetro a la
      * lista de plugins que se ejecutarán
      *
-     * @param plugin: Plugin que añadiremos a la lista
+     * @param plugin: PluginView que añadiremos a la lista
      *
      * @return Boolean: Si ha podido añadirse el plugin a la lista
      */
@@ -19,7 +19,7 @@ interface ISupervisor {
      *
      * @param listaPlugins: LIsta de plugins que se añadirán a la lista
      *
-     * @return ArrayList<Plugin>: Lista con los plugins que no pueden añadirse a la lista
+     * @return ArrayList<PluginView>: Lista con los plugins que no pueden añadirse a la lista
      */
     fun anadirListaPlugins(listaPlugins: List<Plugin>): ArrayList<Plugin>
 
@@ -28,7 +28,7 @@ interface ISupervisor {
      * que tenga el mismo identificador
      * que el pasado por parámetro
      *
-     * @param plugin: Plugin que se buscara en el array
+     * @param plugin: PluginView que se buscara en el array
      *
      * @return Boolean: Si se ha podido eliminar el plugin de la lista
      */
@@ -61,7 +61,7 @@ interface ISupervisor {
          * Se llamará una vez que el plugin se haya
          * ejecutado correctamente
          *
-         * @param plugin: Plugin que se ha ejecutado correctamente
+         * @param plugin: PluginView que se ha ejecutado correctamente
          */
         fun onEjecutadoCorrectamente(plugin: Plugin)
 

@@ -23,7 +23,7 @@ class Supervisor(): ISupervisor, ISupervisor.onPluginEjecutado {
      * Añadimos el plugin pasado por parámetro a la
      * lista de plugins que se ejecutarán
      *
-     * @param plugin: Plugin a añadir a la lista
+     * @param plugin: PluginView a añadir a la lista
      *
      * @return Boolean: Si ha podido añadirse el plugin a la lista
      */
@@ -57,7 +57,7 @@ class Supervisor(): ISupervisor, ISupervisor.onPluginEjecutado {
      *
      * @param listaPlugins: LIsta de plugins que se añadirán a la lista
      *
-     * @return List<Plugin>: Lista con los plugins que no pueden añadirse a la lista
+     * @return List<PluginView>: Lista con los plugins que no pueden añadirse a la lista
      */
     override fun anadirListaPlugins(listaPlugins: List<Plugin>): ArrayList<Plugin>{
 
@@ -106,7 +106,7 @@ class Supervisor(): ISupervisor, ISupervisor.onPluginEjecutado {
      * que tenga el mismo identificador
      * que el pasado por parámetro
      *
-     * @param plugin: Plugin que se buscara en el array
+     * @param plugin: PluginView que se buscara en el array
      */
     override fun eliminarPlugin(plugin: Plugin): Boolean{
 
