@@ -1,10 +1,10 @@
 package Vista.Plugins
 
 import Modelo.Plugin.Plugin
-import Vista.IView
+import Vista.View
 import java.util.ArrayList
 
-interface IPluginView: IView {
+interface IPluginView {
 
     /**
      * Mostramos un spinner de carga indefinido

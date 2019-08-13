@@ -1,6 +1,6 @@
 package Controlador.UI.Ajustes
 
-import Controlador.UI.IController
+import Controlador.IController
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
 

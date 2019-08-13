@@ -1,5 +1,6 @@
 package Controlador.UI.Ajustes
 
+import Controlador.Controller
 import Modelo.Preferencias
 import Utiles.Constantes
 import Utiles.Utils
@@ -13,10 +14,8 @@ import javafx.scene.input.MouseEvent
 import kotlinx.coroutines.*
 
 
-class AjustesController: CoroutineScope, IAjustesController {
+class AjustesController(private val ajustesView: AjustesView): CoroutineScope, IAjustesController, Controller() {
 
-    // Vista a la que está ligada
-    private lateinit var ajustesView: AjustesView
 
     // Contexto en el que se ejecutarán las tareas
     override val coroutineContext: CoroutineContext
@@ -46,9 +45,7 @@ class AjustesController: CoroutineScope, IAjustesController {
         private var yaEjecutado: Boolean = false
     }
 
-
-    private constructor(ajustesView: AjustesView){
-        this.ajustesView = ajustesView
+    init {
         preCargar()
     }
 

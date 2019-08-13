@@ -1,5 +1,5 @@
 package Controlador.UI.Plugins
 
-import Controlador.UI.IController
+import Controlador.IController
 
 interface IPluginsController: IController {}

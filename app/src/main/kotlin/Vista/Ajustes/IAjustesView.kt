@@ -1,8 +1,8 @@
 package Vista.Ajustes
 
-import Vista.IView
+import Vista.View
 
-interface IAjustesView: IView {
+interface IAjustesView {
 
     /**
      * Obtenemos todos los valores de los inputs

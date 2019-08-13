@@ -96,6 +96,10 @@
     -fx-background-color: transparent;
 }
 
+.contenedor-vertical-plugins {
+    -fx-padding: 10 25 30 25;
+}
+
 .scroll-pane > .viewport {
    -fx-background-color: transparent;
 }
@@ -110,8 +114,8 @@
     /*-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);*/
     /*-fx-background-color: #000000;*/
     -fx-background-color: transparent;
-    -fx-border-insets: 30 30 10 30;
-    -fx-background-insets: 30 30 10 30;
+    -fx-border-insets: 30 15 5 15;
+    -fx-background-insets: 30 15 5 15;
 }
 
 .texto-nombre-plugin {

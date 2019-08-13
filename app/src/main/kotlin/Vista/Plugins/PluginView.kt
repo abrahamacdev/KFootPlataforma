@@ -2,26 +2,26 @@ package Vista.Plugins
 
 import Controlador.UI.Plugins.PluginsController
 import Modelo.Plugin.Plugin
+import Utiles.Colar
+import Utiles.Colores
 import Utiles.Utils
-import com.jfoenix.controls.JFXSpinner
+import Vista.View
 import javafx.animation.FadeTransition
-import javafx.application.Platform
 import javafx.fxml.FXMLLoader
 import javafx.scene.Node
 import javafx.scene.control.ScrollPane
 import javafx.scene.layout.*
 import javafx.scene.text.Text
 import javafx.util.Duration
-import java.awt.Color
 import java.util.*
 
-class PluginView: IPluginView {
+class PluginView: IPluginView, View() {
 
     // Layout que pondremos sobre el fragmento principal
     private val layoutPlugins: ScrollPane = FXMLLoader.load<ScrollPane>(javaClass.getResource("../../layouts/plugins.fxml"))
 
     // Layout de carga indefinido
-    val buscandoPlugins = FXMLLoader.load<Node>(javaClass.getResource("../../layouts/spinnerIndefinido.fxml"))
+    private val buscandoPlugins = FXMLLoader.load<Node>(javaClass.getResource("../../layouts/spinnerIndefinido.fxml"))
 
     // Caja a la que iremos añadiendo las nuevas filas de "cards views"
     private val vbox: VBox = (layoutPlugins.content as Pane).children.firstOrNull{ it.id.equals("vboxPlugin") } as VBox
@@ -30,9 +30,7 @@ class PluginView: IPluginView {
     private lateinit var pluginsController: PluginsController
 
     // Factor que usaremos para aumentar la velocidad del scroll
-    private val FACTOR_SCROLL = 5
-
-
+    private val FACTOR_SCROLL = 3
 
 
     override fun iniciar(fragmento: Pane) {
@@ -43,9 +41,6 @@ class PluginView: IPluginView {
         // Aumentamos la velocidad del scroll
         Utils.cambiarSensibilidadScroll(layoutPlugins, FACTOR_SCROLL)
     }
-
-    override fun cancelar() {}
-
 
     override fun mostrarCargaIndefinida() {
         super.renovarContenidoFragmento(buscandoPlugins)
@@ -174,19 +169,19 @@ class PluginView: IPluginView {
      */
     private fun establecerColorGradienteAleatorio(): String{
 
-        val colores: Pair<Color, Color> = Utils.coloresRandomPaleta()
+        val colores: Pair<Colar, Colar> = Colores.coloresRandom()
 
         // Cambia el fondo a un gradiente
         val f = Formatter(StringBuffer("#"))
-        f.format("%02X", colores.first.red)
-        f.format("%02X", colores.first.green)
-        f.format("%02X", colores.first.blue)
+        f.format("%02X", colores.first.r)
+        f.format("%02X", colores.first.g)
+        f.format("%02X", colores.first.b)
         f.toString()
 
         val f2 = Formatter(StringBuffer("#"))
-        f2.format("%02X", colores.second.red)
-        f2.format("%02X", colores.second.green)
-        f2.format("%02X", colores.second.blue)
+        f2.format("%02X", colores.second.r)
+        f2.format("%02X", colores.second.g)
+        f2.format("%02X", colores.second.b)
         f2.toString()
 
         return "-fx-background-color: linear-gradient(to bottom right, $f, $f2);\n"

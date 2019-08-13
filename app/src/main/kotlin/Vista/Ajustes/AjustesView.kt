@@ -4,6 +4,7 @@ import Controlador.UI.Ajustes.AjustesController
 import Modelo.Preferencias
 import Utiles.Constantes
 import Utiles.Utils
+import Vista.View
 import afester.javafx.svg.SvgLoader
 import com.jfoenix.controls.JFXButton
 import com.jfoenix.controls.JFXTextField
@@ -12,10 +13,19 @@ import javafx.fxml.FXMLLoader
 import javafx.scene.control.ScrollPane
 import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
-class AjustesView: IAjustesView{
+class AjustesView: IAjustesView, View(), CoroutineScope {
 
     private lateinit var ajustesController: AjustesController
+
+    // Contexto en el que se ejecutarán las tareas
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Default + AjustesView.job
+
+    // Deferred de la pre carga
+    private lateinit var deferredPreCarga: Deferred<Unit>
 
     companion object {
 
@@ -26,27 +36,45 @@ class AjustesView: IAjustesView{
         var botonDirPlugin: JFXButton? = null
 
         var botonAplicarCambios: JFXButton? = null
+
+        // Job asociado a la coroutina
+        private val job: Job = SupervisorJob()
     }
 
 
+
+    init {
+        // Pre cargamos la vista
+        preCargar()
+    }
+
+    override fun preCargar() {
+        super.preCargar()
+
+        deferredPreCarga = async {
+
+            // Obtenemos el controlador
+            ajustesController = AjustesController.getInstancia(this@AjustesView)
+
+            // Seteamos los listeners
+            val vbox = layoutAjustes.content as VBox
+            val jfxBotones = Utils.buscarNodosPorTipo(JFXButton::class.java, vbox) as ArrayList<JFXButton>
+            jfxBotones.forEach {it.onMouseClicked = ajustesController.getBotonClickListener()}
+        }
+
+    }
 
     override fun iniciar(fragmento: Pane) {
         super.iniciar(fragmento)
 
-        // Obtenemos el controlador
-        ajustesController = AjustesController.getInstancia(this)
-
-        // Seteamos los listeners
-        val vbox = layoutAjustes.content as VBox
-        val jfxBotones = Utils.buscarNodosPorTipo(JFXButton::class.java, vbox) as ArrayList<JFXButton>
-        jfxBotones.forEach {it.onMouseClicked = ajustesController.getBotonClickListener()}
+        // Esperamos a que se complete la pre carga
+        runBlocking {
+            deferredPreCarga.await()
+        }
 
         // Mostramos el layout de ajustes
         renovarContenidoFragmento(layoutAjustes)
     }
-
-    override fun cancelar() {}
-
 
     override fun establecerLabelsInputs(){
         // VBox que contiene todos los controles del fragmento

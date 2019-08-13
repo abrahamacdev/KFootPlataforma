@@ -9,9 +9,9 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="layout-detalle-plugin-base" stylesheets="@../css/estilosPlataforma.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Text fx:id="textoNombrePlugin" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texto-nombre-plugin" text="TextoPrueba" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="80.0" />
-      <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texto-version-plugin" text="Versión" AnchorPane.rightAnchor="95.0" AnchorPane.topAnchor="85.0" />
-      <Text fx:id="textoVersionPlugin" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texto-version-plugin" AnchorPane.rightAnchor="55.0" AnchorPane.topAnchor="85.0" />
+      <Text fx:id="textoNombrePlugin" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texto-nombre-plugin" text="TextoPrueba" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="70.0" />
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texto-version-plugin" text="Versión" AnchorPane.rightAnchor="95.0" AnchorPane.topAnchor="75.0" />
+      <Text fx:id="textoVersionPlugin" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texto-version-plugin" AnchorPane.rightAnchor="55.0" AnchorPane.topAnchor="75.0" />
       <JFXButton buttonType="RAISED" ripplerFill="WHITE" styleClass="boton-ejecutar-plugin" text="Ejecutar" AnchorPane.bottomAnchor="40.0" AnchorPane.rightAnchor="60.0">
          <padding>
             <Insets bottom="15.0" left="60.0" right="60.0" top="15.0" />

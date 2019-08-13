@@ -3,6 +3,7 @@ package Vista.Main
 import Controlador.UI.Main.MainController
 import Utiles.Constantes
 import Vista.Plugins.PluginView
+import Vista.View
 import com.jfoenix.controls.JFXButton
 import com.jfoenix.svg.SVGGlyphLoader
 import javafx.application.Application
@@ -24,7 +25,7 @@ import kotlinx.coroutines.*
  * @author Abraham Álvarez
  * @since 1.0
  */
-class MainView(): Application(), IMainView {
+class MainView(): View(), IMainView {
 
     // Layout principal de la aplicación
     private val mainLayout: Parent = FXMLLoader.load<Parent>(javaClass.getResource("../../layouts/main.fxml"))
@@ -39,13 +40,7 @@ class MainView(): Application(), IMainView {
     // Controlador principal
     private lateinit var mainController: MainController
 
-
     companion object {
-
-        @JvmStatic
-        fun main(args: Array<String>) = runBlocking{
-            val c = MainView().lanzar(args)
-        }
 
         // Etapa principal
         private lateinit var etapaPrincipal: Stage
@@ -56,22 +51,23 @@ class MainView(): Application(), IMainView {
 
     }
 
+    override fun start(etapa: Stage?) {
 
-
-    // Será llamado por la función "main" para comenzar la ejecución
-    private fun lanzar(argumentos: Array<String>){
-        Application.launch(*argumentos)
-    }
-
-    override fun start(primaryStage: Stage?) {
-
-        mainController = MainController(this)
+        // Precargamos la clase
+        this.preCargar()
 
         // Guardamos la etapa principal
-        etapaPrincipal = primaryStage!!
+        etapaPrincipal = etapa!!
 
         // Iniciamos esta vista
         iniciar(mainLayout.lookup("#fragmentoPrincipal") as Pane)
+    }
+
+    override fun preCargar() {
+        super.preCargar()
+
+        // Inicializamos el controlador de la vista
+        mainController = MainController(this)
     }
 
     override fun iniciar(fragmento: Pane) {
@@ -102,23 +98,7 @@ class MainView(): Application(), IMainView {
         // TODO: Optimizar para cargar plugins de forma asíncrona mientras se carga el layout principal de la aplicación
         // Cargamos plugins válidos
         mainController.cambiarLayoutFragmento(PluginView())
-
-        // Obtenemos el office que se encargara de comprobar los plugins
-        // existentes y de lanzarlos
-        /*val office = Office()
-
-        // Si hay plugins validos, los cargaremos y ejecutaremos
-        if(office.existenPlugins()){
-
-            // Cargamos en memoria los plugins
-            office.cargarPlugins()
-
-            // Ejecutamos los plugins cargados
-            val supervisor = office.ejecutarPlugins()
-        }*/
     }
-
-    override fun cancelar() {    }
 
     /**
      * Cargamos la imagen svg que tendrá el botón de apagado
@@ -173,7 +153,7 @@ class MainView(): Application(), IMainView {
         etapaPrincipal.minHeight = if (tempHeight < Constantes.ALTO_MINIMO) Constantes.ALTO_MINIMO else tempHeight
     }
 
-    override fun botonPulsado(boton: Button) {
+    override fun botonPulsado(boton: Button)    {
         botonesMenu.forEach {
             it.styleClass.remove("boton-menu-pulsado")
 

@@ -1,11 +1,9 @@
 package Controlador.UI.Main
 
-import Controlador.UI.IController
 import javafx.event.EventHandler
-import javafx.scene.control.Button
 import javafx.scene.input.MouseEvent
 
-interface IMainController: IController {
+interface IMainController{
 
     /**
      * Retornamos la ruta absoluta de la imagen

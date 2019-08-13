@@ -1,5 +1,6 @@
 package Controlador.UI.Plugins
 
+import Controlador.Controller
 import Controlador.Office.IOffice
 import Controlador.Office.Office
 import Modelo.Plugin.Plugin
@@ -19,7 +20,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
-class PluginsController(private val pluginView: PluginView): IPluginsController, CoroutineScope {
+class PluginsController(private val pluginView: PluginView): IPluginsController, CoroutineScope, Controller() {
 
     private val office: Office = Office()
 

@@ -3,13 +3,15 @@ package Vista
 import javafx.application.Platform
 import javafx.scene.Node
 import javafx.scene.layout.Pane
+import AbstractInicializable
 
-interface IView {
+abstract class View: AbstractInicializable() {
 
     companion object {
         private var fragmentoEstablecido = false
         private lateinit var fragmentoPrincipal: Pane
     }
+
 
     /**
      * Será el método que llamemos para iniciar cada vista
@@ -17,18 +19,13 @@ interface IView {
      *
      * @param fragmento: Fragmento sobre el que pondremos los layouts de cada opción del menú
      */
-    fun iniciar(fragmento: Pane){
+    open fun iniciar(fragmento: Pane){
+        super.iniciar()
         if (!fragmentoEstablecido){
             fragmentoPrincipal = fragmento
             fragmentoEstablecido = true
         }
     }
-
-    /**
-     * Servirá para cancelar en cualquier momento cualquier operación
-     * que esté realizando
-     */
-    fun cancelar()
 
     /**
      * Actualizamos el layout que contendrá el fragmento
@@ -38,7 +35,6 @@ interface IView {
      *
      */
     fun renovarContenidoFragmento(nuevoNodo: Node){
-
         Platform.runLater {
             fragmentoPrincipal.children.clear()
             fragmentoPrincipal.children.add(nuevoNodo)

@@ -1,8 +1,9 @@
 package Controlador.UI.Main
 
-import Controlador.UI.IController
+import Controlador.Controller
+import Controlador.IController
 import Vista.Ajustes.AjustesView
-import Vista.IView
+import Vista.View
 import Vista.Main.MainView
 import Vista.Plugins.PluginView
 import javafx.event.EventHandler
@@ -10,18 +11,21 @@ import javafx.scene.control.Button
 import javafx.scene.input.MouseEvent
 
 
-class MainController(private val mainView: MainView): IMainController{
+class MainController(private val mainView: MainView): IMainController, Controller() {
 
     // Ruta de las imagenes disponibles para la sección "Cuenta" del menú
     private val  rutasImagenesMenuCuenta: Array<String> = arrayOf(javaClass.getResource("../../../imagenes/account1.png").toString(),javaClass.getResource("../../../imagenes/account2.png").toString())
 
     // Vista que esta ocupando actualmente el #fragmentoPrincipal
-    private var vistaFragmento: IView? = null
+    private var vistaFragmento: View? = null
 
     // Listener asociado a los botones del menú
     private var menuClickListener: EventHandler<MouseEvent>? = null
 
 
+    init {
+        preCargar()
+    }
 
     override fun preCargar() {}
 
@@ -35,7 +39,7 @@ class MainController(private val mainView: MainView): IMainController{
      *
      * @param nuevaVistaFrag: Nuevo [IController] que modificará el layout del fragmento
      */
-    fun cambiarLayoutFragmento(nuevaVistaFrag: IView){
+    fun cambiarLayoutFragmento(nuevaVistaFrag: View){
 
         // Comprobamos si el controlador del fragmento que hay actualmente establecido
         // es diferente al nuevo que estableceremos
@@ -62,7 +66,7 @@ class MainController(private val mainView: MainView): IMainController{
      * Comprobamos si la nueva [vista] es la misma
      * que la [vistaFragmento]
      */
-    private fun esDiferenteVistaFrag(vista: IView): Boolean{
+    private fun esDiferenteVistaFrag(vista: View): Boolean{
         return vista != this.vistaFragmento
     }
 
@@ -83,7 +87,7 @@ class MainController(private val mainView: MainView): IMainController{
                             mainView.botonPulsado(botonPulsado)
 
                             // Cambiamos el layout del fragmento principal
-                            var tempViewFrag: IView? = null
+                            var tempViewFrag: View? = null
                             when {
 
                                 // Cargamos el fragmento de plugins
@@ -107,6 +111,10 @@ class MainController(private val mainView: MainView): IMainController{
                                     //tempControlFrag = CuentaController()
                                 }
                             }
+
+                            // Pre cargamos la vista
+                            tempViewFrag!!.preCargar()
+
                             if (tempViewFrag != null){
                                 cambiarLayoutFragmento(tempViewFrag)
                             }

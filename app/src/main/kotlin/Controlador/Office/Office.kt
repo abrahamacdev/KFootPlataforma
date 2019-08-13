@@ -55,7 +55,6 @@ class Office: IOffice{
 
                 override fun onNext(jar: File) {
 
-
                     // Comprobamos si el jar es un plugin valido
                     if (comprobarPluginValido(jar)){
 
@@ -208,7 +207,7 @@ class Office: IOffice{
         // Comprobamos que la clase se llame "MainView"
         if (nomClase.equals("Main")){
 
-            // Cargamos la clase "MainView" del plugin
+            // Cargamos la clase "Main" del plugin
             val classLoader = URLClassLoader.newInstance(arrayOf(URL("jar:file:${jar.absolutePath}!/")))
             val clase = classLoader.loadClass(nomClase)
 
