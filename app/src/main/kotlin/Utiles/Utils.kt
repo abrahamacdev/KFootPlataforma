@@ -8,6 +8,7 @@ import javafx.scene.Node
 import javafx.scene.control.ScrollPane
 import javafx.scene.layout.Pane
 import javafx.stage.DirectoryChooser
+import org.apache.xpath.operations.Bool
 import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 
@@ -163,6 +164,7 @@ object Utils {
 // Permite la suma de dos números atómicos
 operator fun AtomicLong.plus (otro: AtomicLong): AtomicLong = AtomicLong(this.get() + otro.get())
 operator fun AtomicLong.plus (otro: Long): AtomicLong = AtomicLong(this.get() + otro)
+fun AtomicLong.esIgual (otro: AtomicLong): Boolean = this.get() == otro.get()
 
 // Compara si dos colores son diferente
 fun java.awt.Color.esDiferenteDe(color: java.awt.Color?): Boolean {

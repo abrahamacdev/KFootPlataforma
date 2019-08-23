@@ -95,9 +95,10 @@ class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope, IPlu
      * Activamos el plugin para que comience a ejecutarse
      * en su propia coroutina
      *
+     * @param onResultadoInicioListener: Listener por el que transimitiremos el correcto inicio de la ejecución del plugin
      * @param onPluginEjecutadoListener: Listener por el que transmitiremos el resultado de la ejecucion del plugin
      */
-    fun activar(onPluginEjecutadoListener: ISupervisor.onPluginEjecutado) {
+    fun activar(onResultadoInicioListener: IPlugin.onResultadoAccionListener? = null, onPluginEjecutadoListener: ISupervisor.onPluginEjecutado? = null) {
 
         // Para activar el plugin este no debe de estar ejecutándose
         // ni haber completado su ejecucion
@@ -125,9 +126,22 @@ class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope, IPlu
                         // Guardamos un deferred que usaremos para avisar
                         // de la ejecucion del plugin
                         completableDeferred = CompletableDeferred(job)
+
+                        // Indicaremos que se ha iniciado correctamente el plugin
+                        if (onResultadoInicioListener != null){
+                            onResultadoInicioListener.onCompletado()
+                        }
                     }
 
                     override fun onError(e: Exception) {
+
+                        // Indicamos que no se ha podido iniciar el plugin
+                        if (onResultadoInicioListener != null){
+                            onResultadoInicioListener.onError(e)
+                        }
+
+                        // Transmitimos la finalización de la ejecución del plugin
+                        // y acabamos con la coroutina ligada al plugin
                         onPluginTerminado(e)
                     }
                 })
@@ -168,6 +182,14 @@ class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope, IPlu
 
     override fun onPluginTerminado(error: Exception?) {
 
+        // Marcamos el deferred como completado
+        if (completableDeferred != null){
+            completableDeferred!!.complete(Unit)
+        }
+
+        // Cancelamos la coroutina
+        job.cancelChildren()
+
         /**
          * Cambiamos el estado del plugin y propagamos la finalización
          * de la ejecucion del plugin a través del [resultadoEjecucionListener]
@@ -197,14 +219,6 @@ class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope, IPlu
                 }
             }
         }
-
-        // Marcamos el deferred como completado
-        if (completableDeferred != null){
-            completableDeferred!!.complete(Unit)
-        }
-
-        // Cancelamos la coroutina
-        job.cancelChildren()
 
         // Evitamos realizar más llamadas al plugin
         controlPluginListener = null

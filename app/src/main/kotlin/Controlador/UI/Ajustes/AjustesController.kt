@@ -1,6 +1,6 @@
 package Controlador.UI.Ajustes
 
-import Controlador.Controller
+import Controlador.UI.Controller
 import Modelo.Preferencias
 import Utiles.Constantes
 import Utiles.Utils

@@ -1,6 +1,8 @@
 package Vista.Main
 
+import Controlador.Setup
 import Controlador.UI.Main.MainController
+import Modelo.Preferencias
 import Utiles.Constantes
 import Vista.Plugins.PluginView
 import Vista.View
@@ -68,6 +70,9 @@ class MainView(): View(), IMainView {
 
         // Inicializamos el controlador de la vista
         mainController = MainController(this)
+
+        // Realizamos las comprobaciones iniciales
+        Setup.realizarComprobaciones()
     }
 
     override fun iniciar(fragmento: Pane) {

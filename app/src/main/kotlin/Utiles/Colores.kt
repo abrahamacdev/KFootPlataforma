@@ -70,8 +70,6 @@ object Colores {
      */
     fun coloresRandom(): Pair<Colar, Colar> {
 
-        println("Grupos posibles: $posiblesGrupos")
-
         // Generador seguro
         val secureRandom = SecureRandom()
 
@@ -81,8 +79,6 @@ object Colores {
         // Obtenemos los colores posibles del grupo
         val colores = posiblesColores.filter { Color.values().get(it).grupo == grupoColor }
 
-        println("Colores restantes del grupo $grupoColor: $colores")
-
         // Obtenemos de manera aleatoria el primer color según su grupo
         val posPrimero = secureRandom.nextInt(colores.size - 1)
         val indxPrimerColor = colores.get(posPrimero)
@@ -91,15 +87,13 @@ object Colores {
         var temp = java.awt.Color.decode(Color.values().get(indxPrimerColor).value)
         val primerColor = Colar(temp.red, temp.green, temp.blue)
 
-        println("Indice del primer color dentro de #coloresPosibles $posPrimero")
-
         //Creamos el segundo @Colar. Siempre buscaremos obtener el siguiente color del grupo,
         // si no hay siguiente, obtendremos el anterior
         var posSegundo = posPrimero + 1
         if (indxPrimerColor == colores.size - 1) {
             posSegundo = posPrimero - 1
         }
-        var indxSegundoColor = colores.get(posSegundo)
+        val indxSegundoColor = colores.get(posSegundo)
         temp = java.awt.Color.decode(Color.values().get(indxSegundoColor).value)
         val segundoColor = Colar(temp.red, temp.green, temp.blue)
 
@@ -124,8 +118,6 @@ object Colores {
         // Obtenemos los dos colores prohibidos con más antigüedad
         val antiguosColores = Pair(coloresProhibidos.get(0), coloresProhibidos.get(1))
 
-        println(coloresProhibidos)
-
         // Eliminamos los antiguos colores de la lista de prohibidos
         coloresProhibidos.removeAt(0)
         coloresProhibidos.removeAt(0)
@@ -144,8 +136,6 @@ object Colores {
                 gruposProhibidos.remove(grupoAntiguos)
                 posiblesGrupos.add(posiblesGrupos.size,grupoAntiguos)
             }
-
-            println("Colores liberados (Grupo ${Color.values().get(antiguosColores.first).grupo}: ${Color.values().get(antiguosColores.first).value}(${antiguosColores.first}) - ${Color.values().get(antiguosColores.second).value}(${antiguosColores.second})")
         }
 
         // Prohibimos los colores utilizados actualmente
@@ -168,11 +158,6 @@ object Colores {
                 println("${Color.values().get(posColor)}") }
             }
         }*/
-
-        println("Colores que se han prohibido (Grupo ${primerColor.grupo}: $primerColor($posPrimer) - $segundoColor($posSegundo)")
-
-        println(coloresProhibidos)
-
     }
 
     /**

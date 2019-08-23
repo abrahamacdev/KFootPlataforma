@@ -3,6 +3,8 @@ package Controlador.Office
 import Controlador.Supervisor.Supervisor
 import Modelo.Plugin.Plugin
 import Vista.Main.IMainView
+import lib.Plugin.IPlugin
+import java.util.concurrent.atomic.AtomicLong
 
 interface IOffice {
 
@@ -33,7 +35,15 @@ interface IOffice {
      * Llamamos al supervisor para que ejecute todos
      * los plugins que se hallan cargado hasta el momendo
      */
-    fun ejecutarPlugins(): Supervisor
+    //fun ejecutarPlugins(): Supervisor
+
+    /**
+     * Ejecutamos el plugin que tenga el [id] recibido
+     *
+     * @param id: Id que debe de tener el plugin
+     * @param onResultadoInicioListener: Listener por el que transmitiremos el correcto inicio del plugin
+     */
+    fun ejecutarPlugin(id: AtomicLong, onResultadoInicioListener: IPlugin.onResultadoAccionListener? = null)
 
     interface onPluginCargadoListener {
 

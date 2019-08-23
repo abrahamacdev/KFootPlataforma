@@ -2,14 +2,17 @@ package Controlador.Supervisor
 
 import Modelo.Plugin.EstadosPlugin
 import Modelo.Plugin.Plugin
+import Utiles.esIgual
+import lib.Plugin.IPlugin
 import java.util.*
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.collections.ArrayList
 
 /**
  * El [Supervisor] se encarga de gestionar toddo lo relacionado con
  * la ejecucion de los plugins y de la correcta ejecucion de estos
  */
-class Supervisor(): ISupervisor, ISupervisor.onPluginEjecutado {
+class Supervisor: ISupervisor, ISupervisor.onPluginEjecutado {
 
     // Lista con los plugins a ejecutar
     private val plugins: ArrayList<Plugin> = ArrayList()
@@ -17,7 +20,16 @@ class Supervisor(): ISupervisor, ISupervisor.onPluginEjecutado {
     // Lista con los plugins que han terminado de ejecutarse
     private val pluginsCompletados: LinkedList<Plugin> = LinkedList()
 
+    companion object {
 
+        private val instancia = Supervisor()
+
+        fun getInstance(): Supervisor{
+            return instancia
+        }
+    }
+
+    private constructor()
 
     /**
      * Añadimos el plugin pasado por parámetro a la
@@ -133,7 +145,23 @@ class Supervisor(): ISupervisor, ISupervisor.onPluginEjecutado {
     override fun ejecutarPlugins() {
 
         // Activamos todos los plugins que estén inactivos
-        plugins.filter { it.getEstadoActual() == EstadosPlugin.INACTIVO }.forEach{ it.activar(this) }
+        plugins.filter { it.getEstadoActual() == EstadosPlugin.INACTIVO }.forEach{ it.activar(null,this) }
+    }
+
+    /**
+     * Ejectutamos el plugin que tenga el [id] pasado
+     * @param id: Id del plugin a ejecutar
+     * @param onResultadoInicioListener: Listener por el que transmitiremos el correcto inicio del plugin
+     */
+    fun ejecutarPlugin(id: AtomicLong, onResultadoInicioListener: IPlugin.onResultadoAccionListener? = null){
+        val plugin = plugins.firstOrNull{ it.ID.esIgual(id)}
+
+        println(plugin)
+
+        // Activamos el plugin
+        if (plugin != null && plugin.getEstadoActual() == EstadosPlugin.INACTIVO){
+            plugin.activar(onResultadoInicioListener, this)
+        }
     }
 
 

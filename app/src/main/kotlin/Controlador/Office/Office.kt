@@ -13,6 +13,7 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import Vista.Main.IMainView
 import lib.Plugin.IPlugin
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * Esta clase se encarga de toddo lo relacionado con los plugins
@@ -23,11 +24,7 @@ import lib.Plugin.IPlugin
  */
 class Office: IOffice{
 
-    private lateinit var supervisor: Supervisor
-
-    constructor(){
-        supervisor = Supervisor()
-    }
+    private val supervisor: Supervisor = Supervisor.getInstance()
 
     /**
      * Comprobamos que halla plugins validos en el directorio
@@ -133,9 +130,13 @@ class Office: IOffice{
      * Llamamos al supervisor para que ejecute todos
      * los plugins que se hallan cargado hasta el momendo
      */
-    override fun ejecutarPlugins(): Supervisor {
+    /*fun ejecutarPlugins(): Supervisor {
         supervisor.ejecutarPlugins()
         return supervisor
+    }*/
+
+    override fun ejecutarPlugin(id: AtomicLong, onResultadoInicioListener: IPlugin.onResultadoAccionListener?) {
+        supervisor.ejecutarPlugin(id,onResultadoInicioListener)
     }
 
     /**

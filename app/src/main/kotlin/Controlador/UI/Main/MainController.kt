@@ -1,7 +1,6 @@
 package Controlador.UI.Main
 
-import Controlador.Controller
-import Controlador.IController
+import Controlador.UI.Controller
 import Vista.Ajustes.AjustesView
 import Vista.View
 import Vista.Main.MainView

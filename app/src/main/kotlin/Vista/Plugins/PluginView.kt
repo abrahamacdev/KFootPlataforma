@@ -6,6 +6,7 @@ import Utiles.Colar
 import Utiles.Colores
 import Utiles.Utils
 import Vista.View
+import com.jfoenix.controls.JFXButton
 import javafx.animation.FadeTransition
 import javafx.fxml.FXMLLoader
 import javafx.scene.Node
@@ -31,6 +32,7 @@ class PluginView: IPluginView, View() {
 
     // Factor que usaremos para aumentar la velocidad del scroll
     private val FACTOR_SCROLL = 3
+
 
 
     override fun iniciar(fragmento: Pane) {
@@ -150,6 +152,11 @@ class PluginView: IPluginView, View() {
             (base.lookup("#textoNombrePlugin") as Text).text = plugin.getMetaDatos()!!.nombrePlugin
             (base.lookup("#textoVersionPlugin") as Text).text += plugin.getMetaDatos()!!.version.toString()
 
+            // Establecemos el manejador del click para el inicio del plugin
+            (base.lookup("#botonIniciarPlugin") as JFXButton).onMouseClicked = this.pluginsController.getInicioPluginClickListener()
+
+            // Le añadimos el id que tiene el plugin
+            base.id = plugin.ID.toString()
 
             // Le añadimos los estilos correspondientes
             base.style = establecerColorGradienteAleatorio()
