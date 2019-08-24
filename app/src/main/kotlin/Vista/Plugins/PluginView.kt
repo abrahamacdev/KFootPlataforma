@@ -44,6 +44,11 @@ class PluginView: IPluginView, View() {
         Utils.cambiarSensibilidadScroll(layoutPlugins, FACTOR_SCROLL)
     }
 
+    override fun cancelar() {
+        super.cancelar()
+        pluginsController.cancelar()
+    }
+
     override fun mostrarCargaIndefinida() {
         super.renovarContenidoFragmento(buscandoPlugins)
     }

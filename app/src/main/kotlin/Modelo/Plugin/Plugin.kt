@@ -73,10 +73,10 @@ class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope, IPlu
     }
 
     override fun toString(): String {
-        var msg = "(PluginView) Id: $ID. "
+        var msg: String = "Id: $ID "
 
         if (metadatosPlugin != null){
-           msg += "Nombre: ${metadatosPlugin!!.nombrePlugin}"
+           msg += "| Nombre: ${metadatosPlugin!!.nombrePlugin}"
         }
         return msg
     }
@@ -102,7 +102,7 @@ class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope, IPlu
 
         // Para activar el plugin este no debe de estar ejecutándose
         // ni haber completado su ejecucion
-        if (estadoActual == EstadosPlugin.INACTIVO){
+        if (estadoActual == EstadosPlugin.INACTIVO || estadoActual == EstadosPlugin.COMPLETADO){
 
             // Establecemos el listener
             resultadoEjecucionListener = onPluginEjecutadoListener

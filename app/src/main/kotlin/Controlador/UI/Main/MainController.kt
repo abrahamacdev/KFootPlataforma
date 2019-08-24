@@ -75,7 +75,7 @@ class MainController(private val mainView: MainView): IMainController, Controlle
             menuClickListener = object : javafx.event.EventHandler<MouseEvent> {
                 override fun handle(event: MouseEvent?) {
                     val botonPulsado = (event!!.source as Button)
-                    val noEstaPulsado = botonPulsado.styleClass.contains("boton-menu-normal")
+                    val noEstaPulsado = !botonPulsado.styleClass.contains("boton-menu-pulsado")
 
                     when {
 

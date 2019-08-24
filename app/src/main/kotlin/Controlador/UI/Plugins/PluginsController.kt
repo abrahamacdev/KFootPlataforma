@@ -11,6 +11,7 @@ import com.jfoenix.controls.events.JFXDialogEvent
 import io.reactivex.Observable
 import javafx.application.Platform
 import javafx.beans.value.ObservableValue
+import javafx.concurrent.Task
 import javafx.event.EventDispatcher
 import javafx.event.EventHandler
 import javafx.event.EventType
@@ -27,10 +28,14 @@ import kotlinx.coroutines.*
 import lib.Plugin.IPlugin
 import java.io.File
 import java.lang.Exception
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
+import kotlin.system.measureNanoTime
+import kotlin.system.measureTimeMillis
 
 class PluginsController(private val pluginView: PluginView): IPluginsController, CoroutineScope, Controller() {
 
@@ -40,7 +45,6 @@ class PluginsController(private val pluginView: PluginView): IPluginsController,
     private val job = SupervisorJob()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default + job
-
 
 
     init {
@@ -58,16 +62,56 @@ class PluginsController(private val pluginView: PluginView): IPluginsController,
         launch {
 
             // Si existen plugins comenzaremos a cargarlos y mostrarlos
-            if (office.existenPlugins()){
+            var existenPlugins: Boolean? = null
+            val tiempo = measureTimeMillis {
+                existenPlugins = office.existenPlugins()
+            }
+
+            // Si existen plugins los mostramos
+            if (existenPlugins!!){
 
                 // Añadimos todos los plugins al layout
                 pluginView.anadirPluginsUI(obtenerTodosPlugins())
             }
 
+            // Esperamos un poco y mostramos la animación de la tienda
             else {
 
-                val anchorPane: AnchorPane = FXMLLoader.load(javaClass.getResource("../../../layouts/irATienda.fxml"))
+                val block = {
+                    val anchorPane: AnchorPane = FXMLLoader.load(javaClass.getResource("../../layouts/irATienda.fxml"))
 
+                    val webView = anchorPane.lookup("#webViewTienda") as WebView
+                    webView.engine.load(javaClass.getResource("../../animaciones/irATienda/animacion.html").toString())
+
+                    AnchorPane.setRightAnchor(anchorPane,0.0)
+                    AnchorPane.setLeftAnchor(anchorPane,0.0)
+                    AnchorPane.setTopAnchor(anchorPane,0.0)
+                    AnchorPane.setBottomAnchor(anchorPane,0.0)
+
+                    // Comprobamos que no se haya pulsado otra opción del menú principal
+                    if (!ejecCancelado){
+                        pluginView.esconderCargaIndefinida()
+                        pluginView.renovarContenidoFragmento(anchorPane)
+                    }
+                }
+
+
+                // Si ha estado más de 2 segundos buscando plugins mostramos directamente la animación
+                if (tiempo > 2000){
+
+                    // Ejecutamos en el hilo principal
+                    Platform.runLater(block)
+                }
+
+                // Sino esperamos un poco para no saturar el hilo principal
+                else {
+                    // Esperamos 2 segundos
+                    Observable.interval(2,TimeUnit.SECONDS).take(1).subscribe {
+
+                        // Ejecutamos en el hilo principal
+                        Platform.runLater(block)
+                    }
+                }
             }
         }
     }

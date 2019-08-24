@@ -158,18 +158,18 @@ class MainView(): View(), IMainView {
         etapaPrincipal.minHeight = if (tempHeight < Constantes.ALTO_MINIMO) Constantes.ALTO_MINIMO else tempHeight
     }
 
-    override fun botonPulsado(boton: Button)    {
+    override fun botonPulsado(boton: Button) {
+
+        // Recorremos los botones del menú
         botonesMenu.forEach {
+
+            // Eliminamos la clase "boton-menu-pulsado" (si la tiene)
             it.styleClass.remove("boton-menu-pulsado")
 
             when {
                 // Marcamos como pulsado el recibido por parámetros
                 it.id != null && it.id.equals(boton.id) -> boton.styleClass.add("boton-menu-pulsado")
-
-                // Los demás los dejamos sin pulsar
-                else -> it.styleClass.add("boton-menu-normal")
             }
         }
-
     }
 }

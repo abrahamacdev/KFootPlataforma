@@ -1,11 +1,14 @@
 package Controlador.Supervisor
 
+import KFoot.DEBUG
 import Modelo.Plugin.EstadosPlugin
 import Modelo.Plugin.Plugin
 import Utiles.esIgual
 import lib.Plugin.IPlugin
+import java.lang.Exception
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
+import java.util.logging.Logger
 import kotlin.collections.ArrayList
 
 /**
@@ -60,6 +63,14 @@ class Supervisor: ISupervisor, ISupervisor.onPluginEjecutado {
             plugins.add(plugin)
             return true
         }
+
+        // Eliminamos de la lista el plugin e insertamos el nuevo
+        // De esta forma estaremos actualizando el ID del plugin en la lista
+        else {
+            eliminarPlugin(existeCopia)
+            anadirPlugin(plugin)
+        }
+
         return false
     }
 
@@ -154,16 +165,40 @@ class Supervisor: ISupervisor, ISupervisor.onPluginEjecutado {
      * @param onResultadoInicioListener: Listener por el que transmitiremos el correcto inicio del plugin
      */
     fun ejecutarPlugin(id: AtomicLong, onResultadoInicioListener: IPlugin.onResultadoAccionListener? = null){
+
+        // Buscamos el plugin en la lista de plugins que se han encontrado
         val plugin = plugins.firstOrNull{ it.ID.esIgual(id)}
 
-        println(plugin)
+        var errorMsg: String? = null
 
-        // Activamos el plugin
-        if (plugin != null && plugin.getEstadoActual() == EstadosPlugin.INACTIVO){
-            plugin.activar(onResultadoInicioListener, this)
+        // Comprobamos que haya un plugin en la lista con el id solicitado
+        if (plugin != null ){
+
+            val estadoPlugin = plugin.getEstadoActual()
+
+            when {
+
+                // Si el plugin está inactivo Ó
+                // ha completado su ejecución anteriormente Ó
+                // tuvo un error cuando se ejecutó anteriormente,
+                // lo ejecutamos
+                estadoPlugin == EstadosPlugin.INACTIVO || estadoPlugin == EstadosPlugin.COMPLETADO  || estadoPlugin == EstadosPlugin.ERROR-> {
+
+                    plugin.activar(onResultadoInicioListener, this)
+                }
+
+                // Si está actualmente en activo no hacemos nada
+                estadoPlugin == EstadosPlugin.ACTIVO -> {errorMsg = "El plugin se está ejecutando actualmente"}
+            }
+        }
+
+        // Si no se ha podido ejecutar el plugin, pasamos el error
+        if (errorMsg != null){
+            if (onResultadoInicioListener != null){
+                onResultadoInicioListener.onError(Exception(errorMsg))
+            }
         }
     }
-
 
 
 
