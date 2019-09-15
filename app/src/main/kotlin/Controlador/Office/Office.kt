@@ -84,7 +84,13 @@ class Office: IOffice{
      * @param onPluginCargadoListener: Callback por el que pasaremos el plugin recien cargado
      */
     override fun cargarPlugins(onPluginCargadoListener: IOffice.onPluginCargadoListener?){
+        cargarPlugins().forEach {
+            if (onPluginCargadoListener != null){
+                onPluginCargadoListener.onPluginCargado(it)
+            } }
+    }
 
+    override fun cargarPlugins(): ArrayList<Plugin> {
         // Obtenemos todos los jars del directorio de plugins
         val observableJars = Utils.obtenerJarsDirPlugins()
 
@@ -108,12 +114,7 @@ class Office: IOffice{
                         // Creamos un plugin con la ruta del jar y la clase principal
                         val plugin = Plugin(jar, clase)
 
-                        // Pasamos el plugin recién cargado
-                        if (onPluginCargadoListener != null){
-                            onPluginCargadoListener.onPluginCargado(plugin)
-                        }
-
-                        // Añadimos el plugin a la lista de los que se ejecutaran
+                        // Añadimos el plugin al supervisor
                         supervisor.anadirPlugin(plugin)
                     }
                 }
@@ -126,6 +127,8 @@ class Office: IOffice{
             // Cargamos todos los plugins validos
             observableJars.subscribe(observer)
         }
+
+        return Supervisor.getInstance().obtenerPluginsCargados()
     }
 
     /**

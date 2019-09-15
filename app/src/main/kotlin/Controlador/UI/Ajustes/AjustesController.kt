@@ -1,6 +1,7 @@
 package Controlador.UI.Ajustes
 
 import Controlador.UI.Controller
+import KFoot.Logger
 import Modelo.Preferencias
 import Utiles.Constantes
 import Utiles.Utils
@@ -33,6 +34,7 @@ class AjustesController(private val ajustesView: AjustesView): CoroutineScope, I
                 instancia = AjustesController(ajustesView)
             }
 
+            instancia!!.preCargar()
             return instancia!!
         }
 
@@ -45,30 +47,27 @@ class AjustesController(private val ajustesView: AjustesView): CoroutineScope, I
         private var yaEjecutado: Boolean = false
     }
 
-    init {
-        preCargar()
-    }
-
     override fun preCargar() {
 
-        // Comprobamos que no se haya ejecutado antes
-        if (!yaEjecutado){
+        async {
 
-            async {
+            // Establecemos los valores actuales a los inputs del layout
+            ajustesView.establecerLabelsInputs()
 
-                // Establecemos los valores actuales a los inputs del layout
-                ajustesView.establecerLabelsInputs()
+            // Comprobamos que no se haya ejecutado antes
+            if (!yaEjecutado) {
 
                 // Añadimos los validadores a los inputs
                 ajustesView.anadirValidadoresInputs()
-            }
 
-            // Aplicar sombras
-            //iconPane.setEffect(DropShadow(2.0, 0.0, +2.0, Color.BLACK))
+            }
 
             // Guardamos la ejecución
             yaEjecutado = true
         }
+
+        // Aplicar sombras
+        //iconPane.setEffect(DropShadow(2.0, 0.0, +2.0, Color.BLACK))
     }
 
     override fun getBotonClickListener(): EventHandler<MouseEvent> {

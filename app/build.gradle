@@ -37,9 +37,6 @@ dependencies {
 
     // Cargador de imagenes SVG
     compile 'com.github.afester.javafx:FranzXaver:0.1'
-
-    // JavaFX
-    compile fileTree(dir: 'libs/JavaFX', include: '*.jar')
     
     // JFoenix
     compile 'com.jfoenix:jfoenix:8.0.8'

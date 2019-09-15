@@ -1,3 +1,18 @@
+/* General */
+.bordes-fragmento {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+.fondo-superposicion {
+    -fx-background-color: #FCFCFC;
+}
+
+.fondo-basico {
+    -fx-background-color: #FFFFFF;
+}
+/* -------------- */
+
 /* Contenedor Principal */
 .main {
 	-fx-pref-width: 1200.0;
@@ -62,6 +77,42 @@
     -fx-background-radius: 0 0 0 70;
     -fx-border-radius: 0 0 0 70;
 }
+
+.contenedor-dialog-cerrar {
+    -fx-background-color: #00000020;
+}
+
+.titulo-dialog-cerrar {
+    -fx-fill: #eb6b56;
+    -fx-font-family: 'Cambria';
+    -fx-font-size: 2em;
+}
+
+.mensaje-dialog-cerrar {
+    -fx-fill: #353535;
+    -fx-font-family: 'Century';
+    -fx-font-size: 1.5em;
+}
+
+.cancel-boton-dialog-cerrar{
+    -jfx-button-type: FLAT;
+    -fx-font: 1.2em 'Britannic';
+    -fx-text-alignment: center;
+    -fx-text-fill: #eb6b56;
+    -fx-font-weight: bold;
+    -fx-background-color: transparent;
+    -fx-border-color: #eb6b56;
+}
+
+.accept-boton-dialog-cerrar{
+    -jfx-button-type: FLAT;
+    -fx-font: 1.2em 'Britannic';
+    -fx-text-alignment: center;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-background-color: #eb6b56;
+    -fx-border-color: #eb6b56;
+}
 /* -------------- */
 
 
@@ -73,10 +124,7 @@
     -fx-min-width: 600;
     -fx-min-height: 400;
     -fx-max-width: 600;
-    -fx-max-height: 600;   
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 20;
-    -fx-border-radius: 20;
+    -fx-max-height: 600;
 }
 /* -------------- */
 
@@ -136,6 +184,22 @@
     -fx-border-width: 1;
     -fx-background-insets: 0;
 }
+
+.boton-ir-tienda {
+    -jfx-button-type: RAISED;
+    -fx-font: 1.2em 'Britannic';
+    -fx-text-alignment: center;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-background-color: #eb6b56;
+    -fx-border-color: #eb6b56;
+}
+
+.texto-ir-tienda {
+    -fx-fill: #eb6b56;
+    -fx-font: 2.5em 'Adobe Devanagari';
+    -fx-font-weight: bold;
+}
 /* -------------- */
 
 /* Ajustes */
@@ -159,12 +223,6 @@
     -fx-background-color: #eb6b56;   
     -fx-fill: #ffffff;
     -fx-font: bold 1em 'Arial';
-}
-
-.scroll-ajustes {
-    -fx-background-color: #FCFCFC;
-    -fx-background-radius: 20;
-    -fx-border-radius: 20;
 }
 
 .boton-aplicar-cambios {

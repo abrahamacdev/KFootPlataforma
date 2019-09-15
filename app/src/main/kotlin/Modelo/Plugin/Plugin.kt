@@ -2,6 +2,7 @@ package Modelo.Plugin
 
 import Controlador.Supervisor.ISupervisor
 import Controlador.Supervisor.Supervisor
+import KFoot.Logger
 import Utiles.plus
 import com.beust.klaxon.Klaxon
 import com.beust.klaxon.KlaxonException
@@ -148,6 +149,76 @@ class Plugin (val jar: File, val clasePrincipal: Class<*>): CoroutineScope, IPlu
             }
         }
     }
+
+    /**
+     * Pausamos la ejecución del plugin si se está
+     * ejecutanto
+     *
+     * @param resultadoAccionListener: Listener por el que transmitiremos el resultado del pausado
+     */
+    fun pausar(resultadoAccionListener: IPlugin.onResultadoAccionListener? = null){
+
+        // Comprobamos que el plugin se esté ejecutando actualmente
+        if (controlPluginListener != null && estadoActual == EstadosPlugin.ACTIVO){
+
+            controlPluginListener!!.onPausar(object : IPlugin.onResultadoAccionListener {
+                override fun onCompletado() {
+
+                    // Transmitimos el completado por el listener
+                    if (resultadoAccionListener != null){
+                        resultadoAccionListener.onCompletado()
+                    }
+                }
+
+                override fun onError(e: Exception) {
+
+                    // Transmitimos el error por el listener
+                    if (resultadoAccionListener != null){
+                        resultadoAccionListener.onError(e)
+                    }
+                }
+            })
+        }
+    }
+
+    /**
+     * Cancelamos por completo la ejecución del plugin si se está
+     * ejecutando
+     *
+     * @param resultadoAccionListener: Listener por el que transmitiremos el resultado del pausado
+     */
+    fun cancelar(resultadoAccionListener: IPlugin.onResultadoAccionListener? = null){
+
+        // Si el plugin esta activo, mandamos la orden de cancelar su ejecución
+        if (estadoActual == EstadosPlugin.ACTIVO){
+
+            controlPluginListener!!.onCancelar(object : IPlugin.onResultadoAccionListener {
+                override fun onCompletado() {
+
+                    // Transmitimos el completado por el listener
+                    if (resultadoAccionListener != null){
+                        resultadoAccionListener.onCompletado()
+                    }
+                }
+
+                override fun onError(e: Exception) {
+
+                    // Transmitimos el error por el listener
+                    if (resultadoAccionListener != null){
+                        resultadoAccionListener.onError(e)
+                    }
+                }
+            })
+        }
+
+        // Si el plugin no está activo, transmitimos el completado
+        if (resultadoAccionListener != EstadosPlugin.ACTIVO){
+            resultadoAccionListener!!.onCompletado()
+        }
+    }
+
+
+
 
     /**
      * Obtenemos los metadatos del plugin a traves

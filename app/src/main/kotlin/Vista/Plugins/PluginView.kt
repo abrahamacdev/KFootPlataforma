@@ -1,31 +1,54 @@
 package Vista.Plugins
 
 import Controlador.UI.Plugins.PluginsController
+import Modelo.Plugin.EstadosPlugin
 import Modelo.Plugin.Plugin
 import Utiles.Colar
 import Utiles.Colores
 import Utiles.Utils
 import Vista.View
 import com.jfoenix.controls.JFXButton
+import com.jfoenix.controls.JFXDialog
+import com.jfoenix.controls.JFXDialogLayout
 import javafx.animation.FadeTransition
+import javafx.application.Platform
+import javafx.event.EventHandler
 import javafx.fxml.FXMLLoader
 import javafx.scene.Node
 import javafx.scene.control.ScrollPane
 import javafx.scene.layout.*
+import javafx.scene.shape.Ellipse
 import javafx.scene.text.Text
+import javafx.scene.web.WebView
 import javafx.util.Duration
+import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 class PluginView: IPluginView, View() {
 
-    // Layout que pondremos sobre el fragmento principal
-    private val layoutPlugins: ScrollPane = FXMLLoader.load<ScrollPane>(javaClass.getResource("../../layouts/plugins.fxml"))
+    companion object {
+        // Layout que pondremos sobre el fragmento principal
+        private val layoutPlugins: ScrollPane = FXMLLoader.load<ScrollPane>(javaClass.getResource("../../layouts/plugins.fxml"))
 
-    // Layout de carga indefinido
-    private val buscandoPlugins = FXMLLoader.load<Node>(javaClass.getResource("../../layouts/spinnerIndefinido.fxml"))
+        // Layout de carga indefinido
+        private val buscandoPlugins = FXMLLoader.load<Node>(javaClass.getResource("../../layouts/spinnerIndefinido.fxml"))
+
+        // Layout con la animación de ir a tienda
+        private val layoutIrATienda = FXMLLoader.load<AnchorPane>(javaClass.getResource("../../layouts/irATienda.fxml"))
+        private var webViewAnimacionTienda: WebView? = null
+        private var botonIrTienda: JFXButton? = null
+        private var textoIrTienda: Text? = null
+
+        // Dialog que muetsra el inicio de un plugin
+        private var dialogInicioPlugin: JFXDialog? = null
+    }
 
     // Caja a la que iremos añadiendo las nuevas filas de "cards views"
     private val vbox: VBox = (layoutPlugins.content as Pane).children.firstOrNull{ it.id.equals("vboxPlugin") } as VBox
+
+    // Cada una de las filas en las que tenemos plugins
+    private val filas: ArrayList<HBox> = ArrayList()
 
     // Controlador al que está ligado
     private lateinit var pluginsController: PluginsController
@@ -35,8 +58,8 @@ class PluginView: IPluginView, View() {
 
 
 
-    override fun iniciar(fragmento: Pane) {
-        super.iniciar(fragmento)
+    override fun iniciar() {
+        super.iniciar()
 
         pluginsController = PluginsController(this)
 
@@ -47,10 +70,17 @@ class PluginView: IPluginView, View() {
     override fun cancelar() {
         super.cancelar()
         pluginsController.cancelar()
+
+        if (textoIrTienda != null && botonIrTienda != null){
+            textoIrTienda!!.opacity = 0.0
+            botonIrTienda!!.opacity = 0.0
+            botonIrTienda!!.isFocusTraversable = false
+        }
     }
 
+
     override fun mostrarCargaIndefinida() {
-        super.renovarContenidoFragmento(buscandoPlugins)
+        super.renovarFragmentoPrincipal(buscandoPlugins)
     }
 
     override fun cargaIndefinidaMostrandose(): Boolean {
@@ -60,15 +90,117 @@ class PluginView: IPluginView, View() {
     override fun esconderCargaIndefinida() {
         val contenedorSpinner = super.getFragmentoPrincipal().children.firstOrNull { it.id != null && it.id.equals("contenedorSpinner") }
 
-        if (contenedorSpinner != null){
-            super.limpiarFragmento()
-            /*Platform.runLater {
-                super.getFragmentoPrincipal().children.remove(contenedorSpinner)
-            }*/
+        Platform.runLater {
+            getFragmentoPrincipal().children.remove(contenedorSpinner)
         }
     }
 
+
+    override fun mostrarDialogoInicioPlugin() {
+
+        // Cargamos el layout y lo guardamos para un futuro
+        if (dialogInicioPlugin == null){
+
+            // Obtenemos el layout que mostrará la animación
+            val stackPane: StackPane = FXMLLoader.load(javaClass.getResource("../../layouts/dialogInicioPlugin.fxml"))
+            val dialogLayout: JFXDialogLayout = stackPane.children.get(0) as JFXDialogLayout
+
+            // Cargamos la animación al webview y le damos una forma circular
+            val webView = dialogLayout.lookup("#webViewInicioPlugin") as WebView
+            val ellipse = Ellipse(50.0,50.0,50.0,50.0)
+            ellipse.centerX = 70.0
+            ellipse.centerY = 80.0
+            webView.clip = ellipse
+            webView.engine.load(javaClass.getResource("../../animaciones/inicioPlugin/animacion.html").toString())
+
+            // Añadimos los estilos para que el #stackPane ocupe toodo
+            // el tamaño del fragmento principal
+            AnchorPane.setRightAnchor(stackPane,0.0)
+            AnchorPane.setLeftAnchor(stackPane,0.0)
+            AnchorPane.setTopAnchor(stackPane,0.0)
+            AnchorPane.setBottomAnchor(stackPane,0.0)
+            stackPane.style = "-fx-background-color: transparent;\n"
+
+            // Creamos el diálogo con el contendor principal (#stackPane) y el layout
+            // que mostrará la animación
+            dialogInicioPlugin = JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.CENTER, false)
+            dialogInicioPlugin!!.styleClass += "scroll-ajustes"
+            dialogInicioPlugin!!.style = "-fx-background-color: transparent;\n"
+        }
+
+        // Añadimos el contendor del dialogo al fragmento principal y lo mostramos
+        getFragmentoPrincipal().children.add(dialogInicioPlugin!!.dialogContainer)
+        dialogInicioPlugin!!.show()
+    }
+
+    override fun esconderDialogoInicioPlugin() {
+
+        // Comprobamos que el diálogo esté iniciado
+        if (dialogInicioPlugin != null){
+
+            // Cuando cerremos el diálogo eliminaremos el contenedor de este
+            // del fragmento principal
+            dialogInicioPlugin!!.onDialogClosed = EventHandler {
+                Platform.runLater {
+                    getFragmentoPrincipal().children.remove(dialogInicioPlugin!!.dialogContainer)
+                }
+            }
+
+            // Cerramos el dialogo
+            dialogInicioPlugin!!.close()
+        }
+    }
+
+
+    override fun cambiarLayoutEstadoPlugin(node: Node, estaInactivo: Boolean ) {
+
+        // Buscamos el botón de inico de plugins
+        val botonInicioPlugin = (node.lookup("#botonIniciarPlugin") as JFXButton)
+
+        // Buscamos el botón de cancelar el plugin y lo escondemos
+        val botonCancelarPlugin = (node.lookup("#botonCancelarPlugin") as JFXButton)
+
+        // Buscamos el botón de inicio de plugin y lo escondemos
+        val botonPausarPlugin = (node.lookup("#botonPausarPlugin") as JFXButton)
+
+        // Mostraremos el botón "Iniciar"
+        if (estaInactivo){
+            botonInicioPlugin.isFocusTraversable = true
+            botonInicioPlugin.isVisible = true
+
+            // Escondemos los botones de pausar y cancelar
+            botonCancelarPlugin.isFocusTraversable = false
+            botonCancelarPlugin.isVisible = false
+            botonPausarPlugin.isFocusTraversable = false
+            botonPausarPlugin.isVisible = false
+        }
+
+        // Mostraremos los botones "Pausar" | "Cancelar"
+        else {
+            // Escondemos el de iniciar
+            botonInicioPlugin.isFocusTraversable = false
+            botonInicioPlugin.isVisible = false
+
+            // Mostramos los botones de pausar y cancelar
+            botonCancelarPlugin.isFocusTraversable = true
+            botonCancelarPlugin.isVisible = true
+            botonPausarPlugin.isFocusTraversable = false
+            botonPausarPlugin.isVisible = false
+        }
+
+        // Seteamos los clicks listeners
+        botonCancelarPlugin.onMouseClicked = pluginsController.getControlPluginClickListener()
+        botonPausarPlugin.onMouseClicked = pluginsController.getControlPluginClickListener()
+        botonInicioPlugin.onMouseClicked = pluginsController.getControlPluginClickListener()
+
+    }
+
+
+
     override fun anadirPluginsUI(plugins: ArrayList<Plugin>) {
+
+        // Eliminamos todas la filas existentes
+        vbox.children.clear()
 
         val cantidadPlugins = plugins.size
 
@@ -122,15 +254,15 @@ class PluginView: IPluginView, View() {
             // Añadimos todas las filas al layout
             vbox.children.addAll(*filas.toTypedArray())
 
+            // Escondemos la carga indefinida si estaba mostrandose
             if (cargaIndefinidaMostrandose()){
                 esconderCargaIndefinida()
             }
 
             // Mostramos el fragmento con todos los plugins
-            super.renovarContenidoFragmento(layoutPlugins)
+            super.renovarFragmentoPrincipal(layoutPlugins)
         }
     }
-
 
     /**
      * Parseamos los datos del plugin a la vista
@@ -157,14 +289,27 @@ class PluginView: IPluginView, View() {
             (base.lookup("#textoNombrePlugin") as Text).text = plugin.getMetaDatos()!!.nombrePlugin
             (base.lookup("#textoVersionPlugin") as Text).text += plugin.getMetaDatos()!!.version.toString()
 
-            // Establecemos el manejador del click para el inicio del plugin
-            (base.lookup("#botonIniciarPlugin") as JFXButton).onMouseClicked = this.pluginsController.getInicioPluginClickListener()
-
             // Le añadimos el id que tiene el plugin
             base.id = plugin.ID.toString()
 
-            // Le añadimos los estilos correspondientes
+            // Le establecemos el gradiente de fondo
             base.style = establecerColorGradienteAleatorio()
+
+
+            // El plugin está ejecutandose
+            if (plugin.getEstadoActual() == EstadosPlugin.ACTIVO){
+
+                // Cambiamos la vista
+                cambiarLayoutEstadoPlugin(base,false)
+            }
+
+
+            // El plugin está inactivo
+            else {
+
+                // Cambiamos la vista
+                cambiarLayoutEstadoPlugin(base,true)
+            }
         }
 
         // Añadimos elevacion
@@ -207,10 +352,59 @@ class PluginView: IPluginView, View() {
      * @param delayBase: Número de la posición de la tarjeta
      */
     fun anadirAnimacionEntrada(card: Node, delayBase: Int) {
-        val fade = FadeTransition(Duration.millis(1000.0), card)
+        val fade = FadeTransition(Duration.millis(750.0), card)
         fade.setFromValue(0.0);
         fade.setToValue(1.0);
         fade.delay = Duration.millis((delayBase * 100).toDouble())
         fade.play()
+    }
+
+    /**
+     * Mostramos la animación de la tienda y un mensaje
+     * que indique al usuario la inexistencia de plugins
+     * en el directorio de plugins
+     */
+    fun mostrarAnimacionTienda(){
+
+        // Cargamos el webview si aún no lo hicimos
+        if (webViewAnimacionTienda == null){
+            webViewAnimacionTienda = layoutIrATienda.lookup("#webViewTienda") as WebView
+            webViewAnimacionTienda!!.engine.load(javaClass.getResource("../../animaciones/irATienda/animacion.html").toString())
+        }
+
+        // Cacheamos el boton y el texto de ir a tienda
+        if (textoIrTienda == null || botonIrTienda == null){
+            val pane = (layoutIrATienda.lookup("#stackPaneIrATienda") as Pane)
+            textoIrTienda = pane.lookup("#textoIrATienda") as Text
+            botonIrTienda = pane.lookup("#botonIrATienda") as JFXButton
+        }
+
+        // Establecemos los márgenes del layout
+        AnchorPane.setRightAnchor(layoutIrATienda,0.0)
+        AnchorPane.setLeftAnchor(layoutIrATienda,0.0)
+        AnchorPane.setTopAnchor(layoutIrATienda,0.0)
+        AnchorPane.setBottomAnchor(layoutIrATienda,0.0)
+
+        // Añadimos las animaciones al texto de ir a tienda
+        val animacionTexto = FadeTransition(Duration.millis(500.0), textoIrTienda)
+        animacionTexto.setFromValue(0.0);
+        animacionTexto.setToValue(1.0);
+        animacionTexto.delay = Duration.millis(1000.0)
+        animacionTexto.play()
+
+        // Añadimos las animaciones al botón de ir a tienda
+        val animacionBoton = FadeTransition(Duration.millis(500.0), botonIrTienda)
+        animacionBoton.setFromValue(0.0);
+        animacionBoton.setToValue(1.0);
+        animacionBoton.delay = Duration.millis(2000.0)
+        animacionBoton.setOnFinished { botonIrTienda!!.isFocusTraversable = true }
+        animacionBoton.play()
+
+
+        // Comprobamos que no se haya pulsado otra opción del menú principal
+        if (!ejecCancelado){
+            esconderCargaIndefinida()
+            renovarFragmentoPrincipal(layoutIrATienda)
+        }
     }
 }

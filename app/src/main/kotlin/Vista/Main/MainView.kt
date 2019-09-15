@@ -2,13 +2,13 @@ package Vista.Main
 
 import Controlador.Setup
 import Controlador.UI.Main.MainController
-import Modelo.Preferencias
 import Utiles.Constantes
 import Vista.Plugins.PluginView
 import Vista.View
 import com.jfoenix.controls.JFXButton
 import com.jfoenix.svg.SVGGlyphLoader
-import javafx.application.Application
+import javafx.application.Platform
+import javafx.event.EventHandler
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.Scene
@@ -18,7 +18,7 @@ import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import javafx.stage.Screen
 import javafx.stage.Stage
-import kotlinx.coroutines.*
+import javafx.stage.WindowEvent
 
 /**
  * Desde aquí lanzaremos el "Office" desde donde se cargaŕan
@@ -37,7 +37,7 @@ class MainView(): View(), IMainView {
 
     // Botones del menú
     private val botonesMenu: List<Button> = (mainLayout.lookup("#menu") as VBox).children.filter {
-        it is Button && !it.styleClass.contains("jfx-button")}.map { it as Button }.toList()
+        it is Button || it is JFXButton}.map { it as Button }.toList()
 
     // Controlador principal
     private lateinit var mainController: MainController
@@ -53,6 +53,7 @@ class MainView(): View(), IMainView {
 
     }
 
+
     override fun start(etapa: Stage?) {
 
         // Precargamos la clase
@@ -61,12 +62,19 @@ class MainView(): View(), IMainView {
         // Guardamos la etapa principal
         etapaPrincipal = etapa!!
 
+        // Establecemos los fragmentos que se usarán a lo largo
+        // de la aplicación
+        View.setearFragmentos(mainLayout.lookup("#fragmentoPrincipal") as Pane, mainLayout.lookup("#fragmentoAlertas") as Pane)
+
         // Iniciamos esta vista
-        iniciar(mainLayout.lookup("#fragmentoPrincipal") as Pane)
+        iniciar()
     }
 
     override fun preCargar() {
         super.preCargar()
+
+        // Establecemos la salida implicita
+        Platform.setImplicitExit(false  )
 
         // Inicializamos el controlador de la vista
         mainController = MainController(this)
@@ -75,8 +83,8 @@ class MainView(): View(), IMainView {
         Setup.realizarComprobaciones()
     }
 
-    override fun iniciar(fragmento: Pane) {
-        super.iniciar(fragmento)
+    override fun iniciar() {
+        super.iniciar()
 
         // Guardamos la escena principal
         escenaPrincipal = Scene(mainLayout)
@@ -85,8 +93,18 @@ class MainView(): View(), IMainView {
         cargarImagenBotonApagado()
         cargarImagenMenuCuenta()
 
-        // Atendemos los clicks de los botones del menú
-        botonesMenu.forEach { (it as Button).onMouseClicked = mainController.getMenuClickListener() }
+        // Atendemos los clicks de de los distintos items del menú
+        botonesMenu.forEach {
+
+            when {
+                // Es una opción del menú
+                !it.id.equals("botonApagar") -> { it.onMouseClicked = mainController.getItemMenuClickListener() }
+
+                // Es el botón de apagado
+                else -> { it.onMouseClicked = mainController.getCerrarClickListener()}
+            }
+        }
+
 
         // Marcamos como pulsado el botón de los plugins
         val botonPlugins = escenaPrincipal.lookup("#botonPlugins") as Button
@@ -94,6 +112,10 @@ class MainView(): View(), IMainView {
 
         // Establecemos un tamaño mínimo a la ventana
         establecerTamanioMin()
+
+        // Seteamos el listener del boton "Cerrar"
+        //etapaPrincipal.setOnCloseRequest =
+        etapaPrincipal.onCloseRequest = mainController.getCerrarClickListener() as EventHandler<WindowEvent>
 
         // Establecemos la escena a la etapa, maximizamos la ventana y la mostramos
         etapaPrincipal.scene = escenaPrincipal
@@ -120,8 +142,8 @@ class MainView(): View(), IMainView {
 
         // Le establecemos el color de fondo y algunas propiedades más
         glyph.fill = javafx.scene.paint.Color.valueOf("#ffffff")
-        glyph.scaleX = 0.125
-        glyph.scaleY = 0.25
+        glyph.scaleX = 0.15
+        glyph.scaleY = 0.30
         glyph.translateX = -10.0
 
         // Establecemos la imagen al boton

@@ -9,43 +9,60 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<ScrollPane fitToWidth="true" prefHeight="400.0" prefWidth="600.0" stylesheets="@../css/estilosPlataforma.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
-   <content>
-      <VBox alignment="CENTER" style="-fx-alignment: center;">
-         <children>
-            <AnchorPane prefHeight="180.0" styleClass="contenedor-ajuste">
-               <VBox.margin>
-                  <Insets left="200.0" right="200.0" />
-               </VBox.margin>
-               <padding>
-                  <Insets bottom="15.0" left="15.0" top="15.0" />
-               </padding>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" layoutX="10.0" layoutY="10.0" prefHeight="400.0" prefWidth="600.0" stylesheets="@../css/estilosPlataforma.css" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <content>
+            <VBox alignment="CENTER" style="-fx-alignment: center;">
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texto-ajustes" text="Directorio de plugins" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="15.0" />
-                  <JFXTextField fx:id="inputDirPlugins" focusColor="#47b39d" maxWidth="500.0" prefHeight="15.0" prefWidth="500.0" styleClass="input-ajustes" unFocusColor="#eb6b56" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="25.0" />
-                  
-                  <JFXButton fx:id="botonDirPlugin" ripplerFill="#ffe153" style="-fx-text-fill: #ffffff;" styleClass="boton-elegir-dir-plugins" text="Elegir" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="35.0">
+                  <AnchorPane prefHeight="180.0">
+                     <VBox.margin>
+                        <Insets left="200.0" right="200.0" />
+                     </VBox.margin>
                      <padding>
-                        <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                        <Insets bottom="15.0" left="15.0" top="15.0" />
+                     </padding>
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texto-ajustes" text="Directorio de plugins" AnchorPane.leftAnchor="25.0" AnchorPane.topAnchor="15.0" />
+                        <JFXTextField fx:id="inputDirPlugins" focusColor="#47b39d" maxWidth="500.0" prefHeight="15.0" prefWidth="500.0" styleClass="input-ajustes" unFocusColor="#eb6b56" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="25.0" />
+                        <JFXButton fx:id="botonDirPlugin" ripplerFill="#ffe153" style="-fx-text-fill: #ffffff;" styleClass="boton-elegir-dir-plugins" text="Elegir" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="35.0">
+                           <padding>
+                              <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                           </padding>
+                        </JFXButton>
+                     </children>
+                     <styleClass>
+                        <String fx:value="contenedor-ajuste" />
+                        <String fx:value="fondo" />
+                     </styleClass>
+                  </AnchorPane>
+                  <JFXButton fx:id="aplicarCambios" ripplerFill="#ffe153" styleClass="boton-aplicar-cambios" text="Aplicar">
+                     <VBox.margin>
+                        <Insets top="50.0" />
+                     </VBox.margin>
+                     <padding>
+                        <Insets bottom="15.0" left="40.0" right="40.0" top="15.0" />
                      </padding>
                   </JFXButton>
                </children>
-            </AnchorPane>
-            <JFXButton fx:id="aplicarCambios" ripplerFill="#ffe153" styleClass="boton-aplicar-cambios" text="Aplicar">
-               <VBox.margin>
-                  <Insets top="50.0" />
-               </VBox.margin>
                <padding>
-                  <Insets bottom="15.0" left="40.0" right="40.0" top="15.0" />
+                  <Insets bottom="25.0" left="20.0" right="20.0" top="60.0" />
                </padding>
-            </JFXButton>
-         </children>
-         <padding>
-            <Insets bottom="25.0" left="20.0" right="20.0" top="60.0" />
-         </padding></VBox>
-   </content>
+               <styleClass>
+                  <String fx:value="bordes-fragmento" />
+                  <String fx:value="fondo-superposicion" />
+               </styleClass>
+            </VBox>
+         </content>
+         <styleClass>
+            <String fx:value="edge-to-edge" />
+            <String fx:value="bordes-fragmento" />
+            <String fx:value="fondo-superposicion" />
+         </styleClass>
+      </ScrollPane>
+   </children>
    <styleClass>
-      <String fx:value="edge-to-edge" />
-      <String fx:value="scroll-ajustes" />
+      <String fx:value="fondo-superposicion" />
+      <String fx:value="bordes-fragmento" />
    </styleClass>
-</ScrollPane>
+</AnchorPane>

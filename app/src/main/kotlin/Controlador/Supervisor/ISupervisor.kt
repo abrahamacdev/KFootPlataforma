@@ -1,6 +1,9 @@
 package Controlador.Supervisor
 
 import Modelo.Plugin.Plugin
+import lib.Plugin.IPlugin
+import java.util.concurrent.atomic.AtomicLong
+
 interface ISupervisor {
 
     /**
@@ -45,10 +48,46 @@ interface ISupervisor {
     fun eliminarPlugin(pos: Int): Boolean
 
     /**
+     * Obtenemos todos los plugins que están cargados
+     * en el supervisor
+     */
+    fun obtenerPluginsCargados(): ArrayList<Plugin>
+
+
+    /**
+     *
      * Se ejecuta los plugins que se encuentren en la lista
      * en una coroutina separada
      */
-    fun ejecutarPlugins()
+    //fun ejecutarPlugins()
+
+    /**
+     * Ejecutamos el plugin que contenga el [id] recibido por parámetros
+     *
+     * @param id: Id del plugin a ejecutar
+     * @param onResultadoInicioListener: Listener por el que transimitiremos el resultado de la ejecución del plugin
+     */
+    fun ejecutarPlugin(id: AtomicLong, onResultadoInicioListener: IPlugin.onResultadoAccionListener? = null)
+
+
+
+    /**
+     * Pausamos la ejecución de todos los plugins
+     *
+     * @param listener: Listener por el que transimitiremos el resultado del pausado de los plugins
+     */
+    fun pausarPlugins(listener: IPlugin.onResultadoAccionListener? = null)
+
+
+
+    /**
+     * Cancelamos la ejecución de todos los plugins
+     *
+     * @param listener: Listener por el que transimitiremos el resultado del cancelado de los plugins
+     */
+    fun cancelarPlugins(listener: IPlugin.onResultadoAccionListener? = null)
+
+
 
     /**
      * Interfaz que usaremos para saber que plugins

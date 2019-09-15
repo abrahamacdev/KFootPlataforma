@@ -1,13 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Text?>
 <?import javafx.scene.web.WebView?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <WebView fx:id="webViewTienda" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="325.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="50.0" />
-      <JFXButton AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="175.0" AnchorPane.topAnchor="300.0" />
+      <WebView fx:id="webViewTienda" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="350.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0" />
+      <StackPane fx:id="stackPaneIrATienda" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="450.0">
+         <children>
+            <Text fx:id="textoIrATienda" opacity="0.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texto-ir-tienda" text="¡Ups! Parece que no tienes plugins, puedes adquirir nuevos en la tienda" StackPane.alignment="CENTER">
+               <StackPane.margin>
+                  <Insets top="50.0" />
+               </StackPane.margin>
+            </Text>
+            <JFXButton fx:id="botonIrATienda" focusTraversable="false" opacity="0.0" prefHeight="75.0" prefWidth="200.0" ripplerFill="#ffc153" styleClass="boton-ir-tienda" text="Ir a la Tienda" StackPane.alignment="BOTTOM_CENTER">
+               <StackPane.margin>
+                  <Insets bottom="50.0" />
+               </StackPane.margin>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+            </JFXButton>
+         </children>
+      </StackPane>
    </children>
 </AnchorPane>

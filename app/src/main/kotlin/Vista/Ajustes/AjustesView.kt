@@ -1,6 +1,7 @@
 package Vista.Ajustes
 
 import Controlador.UI.Ajustes.AjustesController
+import KFoot.Logger
 import Modelo.Preferencias
 import Utiles.Constantes
 import Utiles.Utils
@@ -11,6 +12,7 @@ import com.jfoenix.controls.JFXTextField
 import com.jfoenix.validation.RequiredFieldValidator
 import javafx.fxml.FXMLLoader
 import javafx.scene.control.ScrollPane
+import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import kotlinx.coroutines.*
@@ -20,9 +22,12 @@ class AjustesView: IAjustesView, View(), CoroutineScope {
 
     private lateinit var ajustesController: AjustesController
 
+    // Job asociado a la coroutina
+    private val job: Job = SupervisorJob()
+
     // Contexto en el que se ejecutarán las tareas
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default + AjustesView.job
+        get() = Dispatchers.Default + job
 
     // Deferred de la pre carga
     private lateinit var deferredPreCarga: Deferred<Unit>
@@ -30,42 +35,33 @@ class AjustesView: IAjustesView, View(), CoroutineScope {
     companion object {
 
         // Layout de "AjustesController" (ajustes.fxml)
-        private val layoutAjustes: ScrollPane = FXMLLoader.load<ScrollPane>(javaClass.getResource("../../layouts/ajustes.fxml"))
+        private val layoutAjustes: AnchorPane = FXMLLoader.load<AnchorPane>(javaClass.getResource("../../layouts/ajustes.fxml"))
 
         var inputDirPlugins: JFXTextField? = null
         var botonDirPlugin: JFXButton? = null
 
         var botonAplicarCambios: JFXButton? = null
-
-        // Job asociado a la coroutina
-        private val job: Job = SupervisorJob()
     }
 
-
-
-    init {
-        // Pre cargamos la vista
-        preCargar()
-    }
 
     override fun preCargar() {
         super.preCargar()
 
+        // Creamos el controlador y seteamos los listeners
         deferredPreCarga = async {
 
             // Obtenemos el controlador
             ajustesController = AjustesController.getInstancia(this@AjustesView)
 
-            // Seteamos los listeners
-            val vbox = layoutAjustes.content as VBox
+            // Seteamos los listeners a los botones
+            val vbox = (layoutAjustes.children.get(0) as ScrollPane).content as VBox
             val jfxBotones = Utils.buscarNodosPorTipo(JFXButton::class.java, vbox) as ArrayList<JFXButton>
             jfxBotones.forEach {it.onMouseClicked = ajustesController.getBotonClickListener()}
         }
-
     }
 
-    override fun iniciar(fragmento: Pane) {
-        super.iniciar(fragmento)
+    override fun iniciar() {
+        super.iniciar()
 
         // Esperamos a que se complete la pre carga
         runBlocking {
@@ -73,15 +69,19 @@ class AjustesView: IAjustesView, View(), CoroutineScope {
         }
 
         // Mostramos el layout de ajustes
-        renovarContenidoFragmento(layoutAjustes)
+        renovarFragmentoPrincipal(layoutAjustes)
+
     }
 
     override fun establecerLabelsInputs(){
         // VBox que contiene todos los controles del fragmento
-        val vbox = layoutAjustes.content as VBox
+        val vbox = (layoutAjustes.children.get(0) as ScrollPane).content as VBox
+
+        if (inputDirPlugins == null){
+            inputDirPlugins = Utils.buscarNodoPorId("inputDirPlugins", vbox) as JFXTextField
+        }
 
         // Establecemos el valor del "directorioPlugins" actual
-        inputDirPlugins = Utils.buscarNodoPorId("inputDirPlugins", vbox) as JFXTextField
         inputDirPlugins!!.text = Preferencias.obtenerOrNulo(Constantes.RUTA_PLUGINS_KEY).toString() ?: ""
     }
 

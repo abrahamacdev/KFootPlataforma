@@ -22,7 +22,7 @@ class Launch: Application() {
     override fun start(p0: Stage?) {
 
         // Seteamos el nivel de debug
-        Logger.getLogger().setDebugLevel(DEBUG.DEBUG_SIMPLE)
+        Logger.getLogger().setDebugLevel(DEBUG.DEBUG_AVANZADO)
 
         // TODO Eliminar
         /*Observable.interval(1, TimeUnit.SECONDS).subscribe {

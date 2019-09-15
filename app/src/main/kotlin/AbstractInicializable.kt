@@ -21,6 +21,9 @@ abstract class AbstractInicializable: Inicializable {
         }
         else {
             ejecIniciado = true
+            ejecCancelado = false
+            ejecPausado = false
+            ejecPrecarga = false
         }
     }
 
@@ -33,21 +36,22 @@ abstract class AbstractInicializable: Inicializable {
         }
     }
 
-    override fun cancelar(){
-        if (ejecCancelado){
-            return
-        }
-        else {
-            ejecCancelado = true
-        }
-    }
-
     override fun reanudar(){
         if (ejecPausado && !ejecCancelado){
             ejecPausado = false
         }
         else {
             return
+        }
+    }
+
+    override fun cancelar(){
+        if (ejecCancelado){
+            return
+        }
+        else {
+            ejecCancelado = true
+            ejecIniciado = false
         }
     }
 }

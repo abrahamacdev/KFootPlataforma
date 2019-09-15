@@ -27,6 +27,15 @@ interface IOffice {
      * Cargamos los plugins validos en memoria
      * para ejecutarlos
      *
+     * @return ArrayList<Plugins>: Lista con los plugins cargados
+     */
+    fun cargarPlugins(): ArrayList<Plugin>
+
+
+    /**
+     * Cargamos los plugins validos en memoria
+     * para ejecutarlos
+     *
      * @param pluginCargadoSub: Sujeto por el que transmitiremos el plugin recien cargado
      */
     /*fun cargarPlugins(pluginCargadoSub: PublishSubject<PluginView>)*/

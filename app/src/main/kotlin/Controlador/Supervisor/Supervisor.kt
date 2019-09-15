@@ -1,6 +1,7 @@
 package Controlador.Supervisor
 
 import KFoot.DEBUG
+import KFoot.Logger
 import Modelo.Plugin.EstadosPlugin
 import Modelo.Plugin.Plugin
 import Utiles.esIgual
@@ -8,7 +9,6 @@ import lib.Plugin.IPlugin
 import java.lang.Exception
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
-import java.util.logging.Logger
 import kotlin.collections.ArrayList
 
 /**
@@ -19,9 +19,6 @@ class Supervisor: ISupervisor, ISupervisor.onPluginEjecutado {
 
     // Lista con los plugins a ejecutar
     private val plugins: ArrayList<Plugin> = ArrayList()
-
-    // Lista con los plugins que han terminado de ejecutarse
-    private val pluginsCompletados: LinkedList<Plugin> = LinkedList()
 
     companion object {
 
@@ -34,14 +31,7 @@ class Supervisor: ISupervisor, ISupervisor.onPluginEjecutado {
 
     private constructor()
 
-    /**
-     * Añadimos el plugin pasado por parámetro a la
-     * lista de plugins que se ejecutarán
-     *
-     * @param plugin: PluginView a añadir a la lista
-     *
-     * @return Boolean: Si ha podido añadirse el plugin a la lista
-     */
+
     override fun anadirPlugin(plugin: Plugin): Boolean{
 
         // Comprobamos si hay otro plugin con el mismo
@@ -64,24 +54,10 @@ class Supervisor: ISupervisor, ISupervisor.onPluginEjecutado {
             return true
         }
 
-        // Eliminamos de la lista el plugin e insertamos el nuevo
-        // De esta forma estaremos actualizando el ID del plugin en la lista
-        else {
-            eliminarPlugin(existeCopia)
-            anadirPlugin(plugin)
-        }
-
         return false
     }
 
-    /**
-     * Añadimos la lista de plugins pasados
-     * por parámetros lista de plugins que se ejecutarán
-     *
-     * @param listaPlugins: LIsta de plugins que se añadirán a la lista
-     *
-     * @return List<PluginView>: Lista con los plugins que no pueden añadirse a la lista
-     */
+
     override fun anadirListaPlugins(listaPlugins: List<Plugin>): ArrayList<Plugin>{
 
         // Lista con los plugins no validos
@@ -103,14 +79,7 @@ class Supervisor: ISupervisor, ISupervisor.onPluginEjecutado {
     }
 
 
-    /**
-     * Eliminamos de la lista el plugin que se
-     * encuentra en la posición pasada por parámetro
-     *
-     * @param pos: Posición del plugin a eliminar
-     *
-     * @return Boolean: Si se ha eliminado
-     */
+
     override fun eliminarPlugin(pos: Int): Boolean{
 
         // TODO: Comprobar primero que el plugin no se este ejecutando
@@ -124,13 +93,6 @@ class Supervisor: ISupervisor, ISupervisor.onPluginEjecutado {
         return false
     }
 
-    /**
-     * Eliminamos de la lista al plugin
-     * que tenga el mismo identificador
-     * que el pasado por parámetro
-     *
-     * @param plugin: PluginView que se buscara en el array
-     */
     override fun eliminarPlugin(plugin: Plugin): Boolean{
 
         // TODO: Comprobar primero que el plugin no se este ejecutando
@@ -149,22 +111,20 @@ class Supervisor: ISupervisor, ISupervisor.onPluginEjecutado {
     }
 
 
-    /**
-     * Ejecutamos todos los plugins que se encuentren en la lista,
-     * cada uno en una coroutina separada
-     */
-    override fun ejecutarPlugins() {
+
+    override fun obtenerPluginsCargados(): ArrayList<Plugin> {
+        return plugins
+    }
+
+
+
+    /*override fun ejecutarPlugins() {
 
         // Activamos todos los plugins que estén inactivos
         plugins.filter { it.getEstadoActual() == EstadosPlugin.INACTIVO }.forEach{ it.activar(null,this) }
-    }
+    }*/
 
-    /**
-     * Ejectutamos el plugin que tenga el [id] pasado
-     * @param id: Id del plugin a ejecutar
-     * @param onResultadoInicioListener: Listener por el que transmitiremos el correcto inicio del plugin
-     */
-    fun ejecutarPlugin(id: AtomicLong, onResultadoInicioListener: IPlugin.onResultadoAccionListener? = null){
+    override fun ejecutarPlugin(id: AtomicLong, onResultadoInicioListener: IPlugin.onResultadoAccionListener?){
 
         // Buscamos el plugin en la lista de plugins que se han encontrado
         val plugin = plugins.firstOrNull{ it.ID.esIgual(id)}
@@ -182,7 +142,7 @@ class Supervisor: ISupervisor, ISupervisor.onPluginEjecutado {
                 // ha completado su ejecución anteriormente Ó
                 // tuvo un error cuando se ejecutó anteriormente,
                 // lo ejecutamos
-                estadoPlugin == EstadosPlugin.INACTIVO || estadoPlugin == EstadosPlugin.COMPLETADO  || estadoPlugin == EstadosPlugin.ERROR-> {
+                estadoPlugin == EstadosPlugin.INACTIVO || estadoPlugin == EstadosPlugin.COMPLETADO  || estadoPlugin == EstadosPlugin.ERROR -> {
 
                     plugin.activar(onResultadoInicioListener, this)
                 }
@@ -202,12 +162,83 @@ class Supervisor: ISupervisor, ISupervisor.onPluginEjecutado {
 
 
 
+    override fun pausarPlugins(listener: IPlugin.onResultadoAccionListener?) {
+
+        val pausados = LinkedList<Plugin>()
+
+        val avisoFinal = {
+
+            // Comprobamos que la cantidad de pausados sea igual
+            // a la cantidad de plugins disponibles
+            if (pausados.size == plugins.size && listener != null){
+                listener.onCompletado()
+            }
+        }
+
+        plugins.forEach {
+            it.pausar(object : IPlugin.onResultadoAccionListener {
+                override fun onCompletado() {
+                    pausados.add(it)
+
+                    // Comprobamos que sea el último plugin que se pausa para
+                    // transmitir la finalización a través del listener
+                    avisoFinal.invoke()
+                }
+
+                override fun onError(e: Exception) {
+                    pausados.add(it)
+
+                    // Comprobamos que sea el último plugin que se pausa para
+                    // transmitir la finalización a través del listener
+                    avisoFinal.invoke()
+                }
+            })
+        }
+    }
+
+
+
+    override fun cancelarPlugins(listener: IPlugin.onResultadoAccionListener?) {
+        val cancelados = LinkedList<Plugin>()
+
+        // No hay plugins que cancelar
+        if (plugins.size == 0){
+            listener!!.onCompletado()
+        }
+
+        val block: (plugin: Plugin) -> Unit = {
+
+            // Añadimos el plugin a la lista de los cancelados
+            cancelados.add(it)
+
+            // Comprobamos que la cantidad de pausados sea igual
+            // a la cantidad de plugins disponibles
+            if (cancelados.size == plugins.size && listener != null){
+                listener.onCompletado()
+            }
+        }
+
+        plugins.forEach {
+            it.cancelar(object : IPlugin.onResultadoAccionListener {
+                override fun onCompletado() {
+                    block.invoke(it)
+                }
+
+                override fun onError(e: Exception) {
+                    block.invoke(it)
+                }
+            })
+        }
+    }
+
+
+
     override fun onEjecutadoCorrectamente(plugin: Plugin) {
-        pluginsCompletados.add(plugin)
+        //pluginsCompletados.add(plugin)
     }
 
     // TODO: Completar el funcionamiento del método
     override fun onErrorEnEjecucion(plugin: Plugin) {
-        pluginsCompletados.add(plugin)
+        //pluginsCompletados.add(plugin)
     }
 }

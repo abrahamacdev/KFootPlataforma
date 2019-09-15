@@ -1,5 +1,6 @@
 package Controlador.UI.Main
 
+import javafx.event.Event
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
 
@@ -16,9 +17,17 @@ interface IMainController{
 
     /**
      * Establecemos los listeners de los botones del
-     * menú principal
+     * menú principal, a excepción del botón de apagar
      *
-     * @return EventHandler<MouseEvent>: Listener asociado al botón
+     * @return EventHandler<MouseEvent>: Listener asociado a los botones
      */
-    fun getMenuClickListener(): EventHandler<MouseEvent>
+    fun getItemMenuClickListener(): EventHandler<MouseEvent>
+
+    /**
+     * Establecemos el listener del botón de apagado
+     * del menú principal
+     *
+     * @return EventHandler<Event>: Listener asociado a los botones de cierre de la aplicación
+     */
+    fun getCerrarClickListener(): EventHandler<Event>
 }

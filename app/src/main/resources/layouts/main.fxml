@@ -50,7 +50,7 @@
                </styleClass>
             </Button>
             <Region prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-            <JFXButton fx:id="botonApagar" alignment="BASELINE_LEFT" ripplerFill="#ffe153">
+            <JFXButton id="botonApagar" fx:id="botonApagar" alignment="BASELINE_LEFT" ripplerFill="#ffe153">
                <styleClass>
                   <String fx:value="boton-menu" />
                   <String fx:value="apagar" />
@@ -58,7 +58,18 @@
             </JFXButton>
          </children>
       </VBox>
-      <AnchorPane id="fragmentoPrincipal" fx:id="fragmento" prefHeight="200.0" prefWidth="200.0" styleClass="contenedor-fragmento" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="230.0" AnchorPane.topAnchor="30.0" />
+      <AnchorPane id="fragmentoPrincipal" fx:id="fragmento" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="230.0" AnchorPane.topAnchor="30.0">
+         <styleClass>
+            <String fx:value="contenedor-fragmento" />
+            <String fx:value="bordes-fragmento" />
+            <String fx:value="fondo-basico" />
+         </styleClass></AnchorPane>
+      <AnchorPane id="fragmentoAlertas" fx:id="fragmento1" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent;" visible="false" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="230.0" AnchorPane.topAnchor="30.0">
+         <styleClass>
+            <String fx:value="contenedor-fragmento" />
+            <String fx:value="bordes-fragmento" />
+         </styleClass>
+      </AnchorPane>
    </children>
    <stylesheets>
       <URL value="@../css/estilosPlataforma.css" />

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXDialogLayout?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Text?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <JFXDialogLayout maxHeight="1.7976931348623157E308" prefHeight="275.0" styleClass="bordes-fragmento" StackPane.alignment="CENTER">
+         <children>
+            <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="250.0" prefWidth="600.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titulo-dialog-cerrar" text="¿Estás seguro de que quieres salir?" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="-50.0" />
+                  <Text smooth="false" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="mensaje-dialog-cerrar" text="Si continuas se cancelarán todos los plugins que se estén ejecutando actualmente. ¿Quieres salir de todas formas?" wrappingWidth="550.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0" />
+                  <JFXButton fx:id="botonAdelante" buttonType="RAISED" graphicTextGap="0.0" ripplerFill="#ffc153" styleClass="accept-boton-dialog-cerrar" text="Adelante" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0">
+                     <padding>
+                        <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+                     </padding>
+                  </JFXButton>
+                  <JFXButton fx:id="botonCancelar" buttonType="RAISED" ripplerFill="#ffc153" styleClass="cancel-boton-dialog-cerrar" text="Cancelar" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="150.0">
+                     <padding>
+                        <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+                     </padding>
+                  </JFXButton>
+               </children>
+            </AnchorPane>
+         </children>
+      </JFXDialogLayout>
+   </children>
+   <styleClass>
+      <String fx:value="contenedor-dialog-cerrar" />
+      <String fx:value="bordes-fragmento" />
+   </styleClass>
+</StackPane>
