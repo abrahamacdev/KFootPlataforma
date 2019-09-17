@@ -231,3 +231,12 @@
     -fx-font: bold 1.2em 'Arial';
 }
 /* -------------- */
+
+/* Login */
+
+.contenedor-login {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+/* -------------- */

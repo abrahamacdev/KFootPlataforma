@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXDialogLayout?>
+<?import com.jfoenix.controls.JFXPasswordField?>
+<?import com.jfoenix.controls.JFXSpinner?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="500.0" prefWidth="600.0" styleClass="contenedor-login" stylesheets="@../css/estilosPlataforma.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <JFXTextField id="nombreUsuarioInput" accessibleRole="PASSWORD_FIELD" focusColor="#f44336" labelFloat="true" layoutX="175.0" layoutY="100.0" prefHeight="50.0" prefWidth="245.0" promptText="Correo electrónico" styleClass="labels-login" unFocusColor="#2196f3" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="175.0" AnchorPane.topAnchor="100.0">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </JFXTextField>
+      <JFXPasswordField id="contraseniaField" focusColor="#f44336" focusTraversable="false" labelFloat="true" layoutX="175.0" layoutY="242.0" prefHeight="50.0" prefWidth="245.0" promptText="Contraseña" styleClass="labels-login" unFocusColor="#2196f3" AnchorPane.bottomAnchor="207.60000000000002" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="175.0" />
+      <JFXButton id="botonLoguearse" alignment="CENTER" buttonType="RAISED" focusTraversable="false" layoutX="231.0" layoutY="299.0" prefHeight="58.0" prefWidth="139.0" ripplerFill="#ba000d" styleClass="boton-loguearse" text="¡Adelante!" AnchorPane.bottomAnchor="75.0" />
+      <StackPane id="stack" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="500.0" prefHeight="400.0" prefWidth="500.0" visible="false" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="50.0">
+         <children>
+            <JFXDialogLayout prefHeight="500.0" prefWidth="600.0">
+               <children>
+                  <StackPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="415.0" prefWidth="600.0">
+                     <children>
+                        <JFXSpinner prefHeight="100.0" prefWidth="300.0" startingAngle="0.0" StackPane.alignment="TOP_CENTER">
+                           <StackPane.margin>
+                              <Insets bottom="210.0" top="125.0" />
+                           </StackPane.margin>
+                        </JFXSpinner>
+                     </children>
+                  </StackPane>
+               </children>
+            </JFXDialogLayout>
+         </children>
+      </StackPane>
+   </children>
+</AnchorPane>

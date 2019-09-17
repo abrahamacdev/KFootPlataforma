@@ -40,6 +40,9 @@ dependencies {
     
     // JFoenix
     compile 'com.jfoenix:jfoenix:8.0.8'
+
+    // KHttp
+    compile 'khttp:khttp:1.0.0'
     
 }
 

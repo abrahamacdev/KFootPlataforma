@@ -1,5 +1,6 @@
 import KFoot.DEBUG
 import KFoot.Logger
+import Vista.Login.LoginView
 import Vista.Main.MainView
 import javafx.application.Application
 import javafx.stage.Stage
@@ -28,7 +29,6 @@ class Launch: Application() {
         /*Observable.interval(1, TimeUnit.SECONDS).subscribe {
             println("Memoria consumida ${Utils.memoriaUsada()} MB (Max: ${Utils.memoriaTotal()})MB")
         }*/
-
         val mainView = MainView()
         mainView.start(p0)
     }

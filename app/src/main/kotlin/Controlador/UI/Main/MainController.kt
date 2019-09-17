@@ -171,10 +171,10 @@ class MainController(private val mainView: MainView): IMainController, Controlle
                             }
                         }
 
-                        // Pre cargamos la vista
-                        tempViewFrag!!.preCargar()
-
                         if (tempViewFrag != null){
+
+                            // Pre cargamos la vista
+                            tempViewFrag!!.preCargar()
                             cambiarLayoutFragmento(tempViewFrag)
                         }
                     }
