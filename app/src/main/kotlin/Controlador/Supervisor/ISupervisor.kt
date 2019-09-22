@@ -1,6 +1,6 @@
 package Controlador.Supervisor
 
-import Modelo.Plugin.Plugin
+import Datos.Modelo.Plugin.Plugin
 import lib.Plugin.IPlugin
 import java.util.concurrent.atomic.AtomicLong
 

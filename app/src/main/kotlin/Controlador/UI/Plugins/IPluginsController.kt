@@ -1,6 +1,5 @@
 package Controlador.UI.Plugins
 
-import Modelo.Plugin.Plugin
 import javafx.event.EventHandler
 import javafx.scene.Node
 import javafx.scene.input.MouseEvent

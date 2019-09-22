@@ -3,7 +3,7 @@ package Controlador
 import KFoot.DEBUG
 import KFoot.IMPORTANCIA
 import KFoot.Logger
-import Modelo.Preferencias
+import Datos.Modelo.Preferencias
 import Utiles.Constantes
 import KFoot.Constantes as KFootConstantes
 import KFoot.Utils as KFootUtils

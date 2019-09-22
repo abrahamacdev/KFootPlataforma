@@ -1,7 +1,6 @@
 package Vista.Plugins
 
-import Modelo.Plugin.Plugin
-import Vista.View
+import Datos.Modelo.Plugin.Plugin
 import javafx.scene.Node
 import java.util.ArrayList
 

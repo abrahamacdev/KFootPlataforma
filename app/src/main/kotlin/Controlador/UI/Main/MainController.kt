@@ -2,8 +2,6 @@ package Controlador.UI.Main
 
 import Controlador.Supervisor.Supervisor
 import Controlador.UI.Controller
-import KFoot.DEBUG
-import KFoot.Logger
 import Vista.Ajustes.AjustesView
 import Vista.View
 import Vista.Main.MainView
@@ -11,21 +9,21 @@ import Vista.Plugins.PluginView
 import com.jfoenix.controls.JFXButton
 import com.jfoenix.controls.JFXDialog
 import com.jfoenix.controls.JFXDialogLayout
+import com.jfoenix.controls.events.JFXDialogEvent
 import io.reactivex.Observable
 import javafx.application.Platform
+import javafx.beans.InvalidationListener
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 import javafx.event.Event
 import javafx.event.EventHandler
+import javafx.event.EventType
 import javafx.fxml.FXMLLoader
-import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
-import javafx.scene.shape.Ellipse
-import javafx.scene.web.WebView
 import lib.Plugin.IPlugin
 import java.lang.Exception
 import java.util.concurrent.TimeUnit
@@ -37,7 +35,30 @@ class MainController(private val mainView: MainView): IMainController, Controlle
     private val rutasImagenesMenuCuenta: Array<String> = arrayOf(javaClass.getResource("../../../imagenes/account1.png").toString(),javaClass.getResource("../../../imagenes/account2.png").toString())
 
     // Dialogo de cierre de la aplicación
-    private var dialogCerrar: JFXDialog? = null
+    private val dialogCerrar: JFXDialog by lazy {
+        // Obtenemos el layout que mostrará la animación
+        val stackPane: StackPane = FXMLLoader.load(javaClass.getResource("../../../layouts/dialogCerrar.fxml"))
+        val dialogLayout: JFXDialogLayout = stackPane.children.get(0) as JFXDialogLayout
+
+        // Añadimos los estilos para que el #stackPane ocupe toodo
+        // el tamaño del fragmento principal
+        AnchorPane.setRightAnchor(stackPane,0.0)
+        AnchorPane.setLeftAnchor(stackPane,0.0)
+        AnchorPane.setTopAnchor(stackPane,0.0)
+        AnchorPane.setBottomAnchor(stackPane,0.0)
+
+        // Seteamos los listeners de los botones de la alerta
+        (dialogLayout.children.get(3) as Pane).children
+                .filter{ it is JFXButton }
+                .forEach { it.onMouseClicked = getAlertaSalirClickListener() }
+
+        // Creamos el diálogo con el contendor principal (#stackPane) y el layout
+        // que mostrará la animación
+        val dialog = JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.CENTER)
+        dialog.styleClass += "bordes-fragmento"
+
+        dialog
+    }
 
     // Vista que esta ocupando actualmente el #fragmentoPrincipal
     private var vistaFragmento: View? = null
@@ -47,9 +68,7 @@ class MainController(private val mainView: MainView): IMainController, Controlle
     }
 
     override fun preCargar() {
-
-        // Cargamos la alerta que se mostrará cuando vayamos a cerrar la app
-        cargarAlertaCerrarApp()
+        super.preCargar{}
     }
 
     override fun obtenerRutaImagenCuenta(): String {
@@ -75,8 +94,8 @@ class MainController(private val mainView: MainView): IMainController, Controlle
 
             // TODO: Hacer que cada vista se elimine del fragmento cuando llamemos a su método "cancelar"
             // Si hay hijos en la vista los eliminamos
-            if (mainView.getFragmentoPrincipal().children.size > 0){
-                mainView.limpiarFragmentoPrincipal()
+            if (mainView.getFragmento().children.size > 0){
+                mainView.limpiarFragmento()
             }
 
             // Iniciamos el nuevo controlador del fragmento
@@ -94,41 +113,6 @@ class MainController(private val mainView: MainView): IMainController, Controlle
     }
 
 
-    /**
-     * Cargamos el dialog que se mostrará si se intenta cerrar la aplicación
-     */
-    private fun cargarAlertaCerrarApp(){
-        // Cargamos el diálogo de cerrar
-        if (dialogCerrar == null){
-            // Obtenemos el layout que mostrará la animación
-            val stackPane: StackPane = FXMLLoader.load(javaClass.getResource("../../../layouts/dialogCerrar.fxml"))
-            val dialogLayout: JFXDialogLayout = stackPane.children.get(0) as JFXDialogLayout
-
-            // Añadimos los estilos para que el #stackPane ocupe toodo
-            // el tamaño del fragmento principal
-            AnchorPane.setRightAnchor(stackPane,0.0)
-            AnchorPane.setLeftAnchor(stackPane,0.0)
-            AnchorPane.setTopAnchor(stackPane,0.0)
-            AnchorPane.setBottomAnchor(stackPane,0.0)
-
-            // Seteamos los listeners de los botones de la alerta
-            (dialogLayout.children.get(3) as Pane).children
-                    .filter{ it is JFXButton }
-                    .forEach { it.onMouseClicked = getAlertaSalirClickListener() }
-
-            // Creamos el diálogo con el contendor principal (#stackPane) y el layout
-            // que mostrará la animación
-            dialogCerrar = JFXDialog(stackPane, dialogLayout, JFXDialog.DialogTransition.CENTER)
-            dialogCerrar!!.styleClass += "bordes-fragmento"
-            dialogCerrar!!.setOnDialogClosed {
-                Platform.runLater {
-                    mainView.ocultarFragmentoAlertas()
-                }
-            }
-        }
-    }
-
-
 
     override fun getItemMenuClickListener(): EventHandler<MouseEvent> {
         return object : javafx.event.EventHandler<MouseEvent> {
@@ -143,7 +127,7 @@ class MainController(private val mainView: MainView): IMainController, Controlle
                     noEstaPulsado -> {
 
                         // A los demás botones les ponemos el color de fondo normal
-                        mainView.botonPulsado(botonPulsado)
+                        mainView.botonMenuPulsado(botonPulsado)
 
                         // Cambiamos el layout del fragmento principal
                         var tempViewFrag: View? = null
@@ -188,9 +172,7 @@ class MainController(private val mainView: MainView): IMainController, Controlle
             override fun handle(p0: Event) {
 
                 // Añadimos el #stackPane al fragmento alertas y lo mostramos
-                mainView.mostrarFragmentoAlertas(dialogCerrar!!.dialogContainer) {
-                    dialogCerrar!!.show()
-                }
+                mainView.mostrarDialogPrimario(dialogCerrar!!)
 
                 // Consumimos el evento para evitar que se cierre la aplicación
                 p0.consume()

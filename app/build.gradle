@@ -35,6 +35,9 @@ dependencies {
     // Utiles de la libreria KFoot
     compile fileTree(dir: 'libs/KFootLib', include: '*.jar')
 
+    // SVG
+    compile group: 'de.codecentric.centerdevice', name: 'javafxsvg', version: '1.3.0'
+
     // Cargador de imagenes SVG
     compile 'com.github.afester.javafx:FranzXaver:0.1'
     

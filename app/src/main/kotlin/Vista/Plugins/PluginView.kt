@@ -1,8 +1,8 @@
 package Vista.Plugins
 
 import Controlador.UI.Plugins.PluginsController
-import Modelo.Plugin.EstadosPlugin
-import Modelo.Plugin.Plugin
+import Datos.Modelo.Plugin.EstadosPlugin
+import Datos.Modelo.Plugin.Plugin
 import Utiles.Colar
 import Utiles.Colores
 import Utiles.Utils
@@ -21,7 +21,6 @@ import javafx.scene.shape.Ellipse
 import javafx.scene.text.Text
 import javafx.scene.web.WebView
 import javafx.util.Duration
-import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -80,19 +79,20 @@ class PluginView: IPluginView, View() {
 
 
     override fun mostrarCargaIndefinida() {
-        super.renovarFragmentoPrincipal(buscandoPlugins)
+        //super.renovarFragmentoPrincipal(buscandoPlugins)
     }
 
     override fun cargaIndefinidaMostrandose(): Boolean {
-        return super.getFragmentoPrincipal().children.firstOrNull { it.id != null && it.id.equals("contenedorSpinner") } != null
+        //return super.getFragmentoPrincipal().children.firstOrNull { it.id != null && it.id.equals("contenedorSpinner") } != null
+        return true
     }
 
     override fun esconderCargaIndefinida() {
-        val contenedorSpinner = super.getFragmentoPrincipal().children.firstOrNull { it.id != null && it.id.equals("contenedorSpinner") }
+        /*val contenedorSpinner = super.getFragmentoPrincipal().children.firstOrNull { it.id != null && it.id.equals("contenedorSpinner") }
 
         Platform.runLater {
             getFragmentoPrincipal().children.remove(contenedorSpinner)
-        }
+        }*/
     }
 
 
@@ -129,7 +129,7 @@ class PluginView: IPluginView, View() {
         }
 
         // Añadimos el contendor del dialogo al fragmento principal y lo mostramos
-        getFragmentoPrincipal().children.add(dialogInicioPlugin!!.dialogContainer)
+        //getFragmentoPrincipal().children.add(dialogInicioPlugin!!.dialogContainer)
         dialogInicioPlugin!!.show()
     }
 
@@ -142,7 +142,7 @@ class PluginView: IPluginView, View() {
             // del fragmento principal
             dialogInicioPlugin!!.onDialogClosed = EventHandler {
                 Platform.runLater {
-                    getFragmentoPrincipal().children.remove(dialogInicioPlugin!!.dialogContainer)
+                    //getFragmentoPrincipal().children.remove(dialogInicioPlugin!!.dialogContainer)
                 }
             }
 
@@ -260,7 +260,7 @@ class PluginView: IPluginView, View() {
             }
 
             // Mostramos el fragmento con todos los plugins
-            super.renovarFragmentoPrincipal(layoutPlugins)
+            //super.renovarFragmentoPrincipal(layoutPlugins)
         }
     }
 
@@ -404,7 +404,7 @@ class PluginView: IPluginView, View() {
         // Comprobamos que no se haya pulsado otra opción del menú principal
         if (!ejecCancelado){
             esconderCargaIndefinida()
-            renovarFragmentoPrincipal(layoutIrATienda)
+            //renovarFragmentoPrincipal(layoutIrATienda)
         }
     }
 }

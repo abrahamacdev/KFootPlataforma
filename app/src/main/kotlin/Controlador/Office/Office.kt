@@ -1,9 +1,7 @@
 package Controlador.Office
 
 import Controlador.Supervisor.Supervisor
-import KFoot.DEBUG
-import KFoot.Logger
-import Modelo.Plugin.Plugin
+import Datos.Modelo.Plugin.Plugin
 import Utiles.Utils
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -13,7 +11,6 @@ import java.net.URL
 import java.net.URLClassLoader
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
-import Vista.Main.IMainView
 import lib.Plugin.IPlugin
 import java.util.concurrent.atomic.AtomicLong
 

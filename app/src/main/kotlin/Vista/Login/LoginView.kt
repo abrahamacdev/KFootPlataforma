@@ -1,18 +1,38 @@
 package Vista.Login
 
 import Controlador.UI.Login.LoginController
+import Vista.Main.MainView
 import Vista.View
 import afester.javafx.svg.SvgLoader
 import com.jfoenix.controls.*
+import com.jfoenix.svg.SVGGlyphLoader
 import com.jfoenix.validation.RequiredFieldValidator
+import javafx.application.Platform
 import javafx.fxml.FXMLLoader
-import javafx.scene.layout.AnchorPane
-import javafx.scene.layout.StackPane
+import javafx.geometry.Rectangle2D
+import javafx.geometry.Side
+import javafx.scene.Node
+import javafx.scene.Parent
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
+import javafx.scene.layout.*
+import sun.applet.Main
 
 class LoginView: ILoginView, View {
 
     // Layout del login
-    val loginLayout: AnchorPane = FXMLLoader.load(javaClass.getResource("../../layouts/login.fxml"))
+    val loginLayout: StackPane by lazy {
+
+        val stackPane: StackPane = FXMLLoader.load(javaClass.getResource("../../layouts/login.fxml"))
+
+        // Establecemos el tamaño del fondo al tamaño total de la ventana
+        AnchorPane.setBottomAnchor(stackPane,0.0)
+        AnchorPane.setTopAnchor(stackPane,0.0)
+        AnchorPane.setRightAnchor(stackPane,0.0)
+        AnchorPane.setLeftAnchor(stackPane,0.0)
+
+        stackPane
+    }
 
     // Dialog de carga
     val dialogCarga: JFXDialog by lazy {
@@ -37,6 +57,7 @@ class LoginView: ILoginView, View {
         dialog.setOnDialogClosed {
             dialog.dialogContainer.isVisible = false
             dialog.dialogContainer.isFocusTraversable = false
+            this.pausar() // Pausamos la vista
         }
         dialog
     }
@@ -45,7 +66,18 @@ class LoginView: ILoginView, View {
     private val loginController = LoginController(this)
 
     // Fields
-    val usuarioField = loginLayout.lookup("#nombreUsuarioInput") as JFXTextField
+    val usuarioField by lazy {
+        val field = loginLayout.lookup("#nombreUsuarioInput") as JFXTextField
+
+        // Obtenemos la imagen del botón de apagado
+        val imagen = Image(javaClass.getResource("../../imagenes/user.svg").toString(), 20.0, 20.0, false, true)
+
+        //val backgroundSize = BackgroundSize(100.0, 100.0, true, true, true, false)
+        val backgroundImage = BackgroundImage(imagen,BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition(Side.RIGHT, 0.0, false, Side.BOTTOM, 10.0, false), BackgroundSize.DEFAULT)
+        field.background = Background(backgroundImage)
+
+        field
+    }
     val contraseniaField = loginLayout.lookup("#contraseniaField") as JFXPasswordField
 
     // Validadores
@@ -60,6 +92,28 @@ class LoginView: ILoginView, View {
 
         // Establecemos los validadores de los labels
         establecerValidadores()
+    }
+
+    override fun iniciar() {
+        super.iniciar{
+
+            Platform.runLater {
+                // Añadimos el contendor del dialog al main layout
+                View.getLayoutPrincipal()!!.children.add(loginLayout)
+            }
+        }
+    }
+
+    override fun pausar() {
+        super.pausar{
+
+        }
+    }
+
+    override fun reanudar() {
+        super.reanudar{
+            mostrarDialogCarga()
+        }
     }
 
     private fun establecerValidadores(){

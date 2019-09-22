@@ -1,4 +1,4 @@
-package Modelo
+package Datos.Modelo
 
 import java.util.prefs.Preferences
 import KFoot.Constantes as KFootConstantes

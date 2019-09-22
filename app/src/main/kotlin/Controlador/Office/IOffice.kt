@@ -1,8 +1,6 @@
 package Controlador.Office
 
-import Controlador.Supervisor.Supervisor
-import Modelo.Plugin.Plugin
-import Vista.Main.IMainView
+import Datos.Modelo.Plugin.Plugin
 import lib.Plugin.IPlugin
 import java.util.concurrent.atomic.AtomicLong
 

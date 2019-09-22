@@ -1,9 +1,7 @@
 package Controlador.Supervisor
 
-import KFoot.DEBUG
-import KFoot.Logger
-import Modelo.Plugin.EstadosPlugin
-import Modelo.Plugin.Plugin
+import Datos.Modelo.Plugin.EstadosPlugin
+import Datos.Modelo.Plugin.Plugin
 import Utiles.esIgual
 import lib.Plugin.IPlugin
 import java.lang.Exception

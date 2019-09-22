@@ -1,8 +1,7 @@
 package Vista.Ajustes
 
 import Controlador.UI.Ajustes.AjustesController
-import KFoot.Logger
-import Modelo.Preferencias
+import Datos.Modelo.Preferencias
 import Utiles.Constantes
 import Utiles.Utils
 import Vista.View
@@ -13,7 +12,6 @@ import com.jfoenix.validation.RequiredFieldValidator
 import javafx.fxml.FXMLLoader
 import javafx.scene.control.ScrollPane
 import javafx.scene.layout.AnchorPane
-import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
@@ -69,7 +67,7 @@ class AjustesView: IAjustesView, View(), CoroutineScope {
         }
 
         // Mostramos el layout de ajustes
-        renovarFragmentoPrincipal(layoutAjustes)
+        //renovarFragmentoPrincipal(layoutAjustes)
 
     }
 

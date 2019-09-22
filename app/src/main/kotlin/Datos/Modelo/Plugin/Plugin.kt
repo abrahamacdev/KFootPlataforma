@@ -1,8 +1,6 @@
-package Modelo.Plugin
+package Datos.Modelo.Plugin
 
 import Controlador.Supervisor.ISupervisor
-import Controlador.Supervisor.Supervisor
-import KFoot.Logger
 import Utiles.plus
 import com.beust.klaxon.Klaxon
 import com.beust.klaxon.KlaxonException

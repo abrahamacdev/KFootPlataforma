@@ -6,13 +6,7 @@ import javafx.stage.Stage
 interface IMainView {
 
     /**
-     *  Comienza la ejecución del programa
-     *  @param etapa: Etapa que se utilizará para mostrar el contenido
+     * Marcamos como pulsado el [boton] del menú recibido por parámetros
      */
-    fun start(etapa: Stage?)
-
-    /**
-     * Marcamos como pulsado el [boton] recibido por parámetros
-     */
-    fun botonPulsado(boton: Button)
+    fun botonMenuPulsado(boton: Button)
 }

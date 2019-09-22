@@ -27,8 +27,6 @@ class LoginController(private val loginView: LoginView): ILoginController, Corou
                 // Obtenemos el nombre de usuario y la contrasenia
                 val nombreUsuario = loginView.usuarioField.text
                 val contrasenia = loginView.contraseniaField.characters
-
-
             }
         }
     }

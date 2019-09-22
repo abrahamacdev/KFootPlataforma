@@ -1,14 +1,15 @@
 package Utiles
 
-import Modelo.Preferencias
+import Datos.Modelo.Preferencias
 import Vista.Main.MainView
+import Vista.View
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.toObservable
 import javafx.scene.Node
 import javafx.scene.control.ScrollPane
 import javafx.scene.layout.Pane
 import javafx.stage.DirectoryChooser
-import org.apache.xpath.operations.Bool
+import javafx.stage.Screen
 import java.io.File
 import java.util.concurrent.atomic.AtomicLong
 
@@ -156,7 +157,23 @@ object Utils {
      * Mostramos un selector de directorios
      */
     fun mostrarSelectorDirectorio(): File?{
-        return DirectoryChooser().showDialog(MainView.getEtapa())
+        return DirectoryChooser().showDialog(View.getEscenarioPrincipal())
+    }
+
+    /**
+     * Retornamos el tamanio mínimo que deberá tener nuestro escenario
+     */
+    fun obtenerTamanioMin(): Pair<Double, Double>{
+
+        val tamanioPantalla = Screen.getPrimary().visualBounds
+
+        val tempWidth = tamanioPantalla.width / 5 * 4
+        val tempHeight = tamanioPantalla.getWidth() / 5 * 2
+
+        val minWidth = if (tempWidth < Constantes.ANCHO_MINIMO) Constantes.ANCHO_MINIMO else tempWidth
+        val minHeight = if (tempHeight < Constantes.ALTO_MINIMO) Constantes.ALTO_MINIMO else tempHeight
+
+        return Pair(minWidth,minHeight)
     }
 
 }

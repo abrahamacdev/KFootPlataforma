@@ -1,7 +1,5 @@
 package Utiles
 
-import Modelo.Preferencias
-
 object Constantes {
 
     // -- Nombres de las keys de las preferencias --

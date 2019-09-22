@@ -10,7 +10,12 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane id="main" minHeight="-Infinity" minWidth="-Infinity" styleClass="main" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="main" minHeight="-Infinity" minWidth="-Infinity" styleClass="main" xmlns="http://javafx.com/javafx/11.0.1" 
+   xmlns:fx="http://javafx.com/fxml/1"
+   AnchorPane.bottomAnchor="0.0" 
+   AnchorPane.rightAnchor="0.0" 
+   AnchorPane.topAnchor="0.0"
+   AnchorPane.leftAnchor="0.0">
    <children>
       <VBox id="menu" styleClass="lista-botones-menu" AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="60.0">
          <children>
@@ -64,12 +69,6 @@
             <String fx:value="bordes-fragmento" />
             <String fx:value="fondo-basico" />
          </styleClass></AnchorPane>
-      <AnchorPane id="fragmentoAlertas" fx:id="fragmento1" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: transparent;" visible="false" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="230.0" AnchorPane.topAnchor="30.0">
-         <styleClass>
-            <String fx:value="contenedor-fragmento" />
-            <String fx:value="bordes-fragmento" />
-         </styleClass>
-      </AnchorPane>
    </children>
    <stylesheets>
       <URL value="@../css/estilosPlataforma.css" />

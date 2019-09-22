@@ -233,10 +233,42 @@
 /* -------------- */
 
 /* Login */
+.fondo-contenedor-login {
+    -fx-background-color: rgba(255,255,255,0.5);
+}
 
 .contenedor-login {
     -fx-background-radius: 10;
     -fx-border-radius: 10;
+    -fx-background-color: #fff;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 20, 0, 4, 4);
+}
+
+.label-titulo-login {
+    -fx-font-size: 3.5em 'Cambria';
+    -fx-font-weight: bold;
+    -fx-text-fill: #eb6b56;
+}
+
+.label-subtitulo-login {
+    -fx-font-size: 1.4em 'Cambria';
+    -fx-text-fill: #7f7f7f;
+}
+
+.inputs-login {
+    -fx-font-size: 1.5em;
+}
+
+.boton-loguearse {
+    -jfx-button-type: FLAT;
+    -fx-background-color: #eb6b56;   
+    -fx-text-fill: #fff;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-font: 1.5em 'Arial';
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-padding: 15;
 }
 
 /* -------------- */

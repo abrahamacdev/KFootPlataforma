@@ -37,42 +37,45 @@ class PluginsController(private val pluginView: PluginView): IPluginsController,
 
     override fun preCargar() {
 
-        // Mostramos la carga indefinida, se ocultará una vez que
-        // vayamos a mostrar los plugins disponibles
-        pluginView.mostrarCargaIndefinida()
+        super.preCargar{
 
-        launch {
+            // Mostramos la carga indefinida, se ocultará una vez que
+            // vayamos a mostrar los plugins disponibles
+            pluginView.mostrarCargaIndefinida()
 
-            // Si existen plugins comenzaremos a cargarlos y mostrarlos
-            var existenPlugins: Boolean? = null
-            val tiempo = measureTimeMillis {
-                existenPlugins = office.existenPlugins()
-            }
+            launch {
 
-            // Si existen plugins los mostramos
-            if (existenPlugins!!){
-
-                // Añadimos todos los plugins al layout
-                pluginView.anadirPluginsUI(office.cargarPlugins())
-            }
-
-            // Esperamos un poco y mostramos la animación de la tienda
-            else {
-
-                // Si ha estado más de 1 segundo buscando plugins mostramos directamente la animación
-                if (tiempo > 1000){
-
-                    // Ejecutamos en el hilo principal
-                    Platform.runLater{pluginView.mostrarAnimacionTienda()}
+                // Si existen plugins comenzaremos a cargarlos y mostrarlos
+                var existenPlugins: Boolean? = null
+                val tiempo = measureTimeMillis {
+                    existenPlugins = office.existenPlugins()
                 }
 
-                // Sino esperamos un poco para no saturar el hilo principal
+                // Si existen plugins los mostramos
+                if (existenPlugins!!){
+
+                    // Añadimos todos los plugins al layout
+                    pluginView.anadirPluginsUI(office.cargarPlugins())
+                }
+
+                // Esperamos un poco y mostramos la animación de la tienda
                 else {
-                    // Esperamos 1 segundo
-                    Observable.interval(1,TimeUnit.SECONDS).take(1).subscribe {
+
+                    // Si ha estado más de 1 segundo buscando plugins mostramos directamente la animación
+                    if (tiempo > 1000){
 
                         // Ejecutamos en el hilo principal
                         Platform.runLater{pluginView.mostrarAnimacionTienda()}
+                    }
+
+                    // Sino esperamos un poco para no saturar el hilo principal
+                    else {
+                        // Esperamos 1 segundo
+                        Observable.interval(1,TimeUnit.SECONDS).take(1).subscribe {
+
+                            // Ejecutamos en el hilo principal
+                            Platform.runLater{pluginView.mostrarAnimacionTienda()}
+                        }
                     }
                 }
             }
