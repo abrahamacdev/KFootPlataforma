@@ -1,15 +1,18 @@
 import Controlador.Setup
 import Datos.Modelo.ParametrosEscenario
+import KFoot.Constantes
 import KFoot.DEBUG
 import KFoot.Logger
 import Utiles.Utils
 import Vista.View
 import Vista.Main.MainView
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory
+import io.reactivex.Observable
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.stage.Stage
+import java.util.concurrent.TimeUnit
 
 
 class Launch: Application() {
@@ -27,6 +30,13 @@ class Launch: Application() {
     }
 
     override fun start(p0: Stage?) {
+
+        Observable.interval(3, TimeUnit.SECONDS).subscribe {
+            println("Memoria máxima: ${Runtime.getRuntime().maxMemory() / 1024 / 1024} MB")
+            println("Memoria libre disponible: ${KFoot.Utils.memoriaTotalDisponible(Constantes.UNIDAD_ALMACENAMIENTO.MEGABYTE)} MB")
+            println("Memoria total usada: ${KFoot.Utils.memoriaUsada(Constantes.UNIDAD_ALMACENAMIENTO.MEGABYTE)} MB")
+            println("------------------------------------")
+        }
 
         // Permitimos el parseo de svg's como imágenes no vectoriales
         SvgImageLoaderFactory.install();

@@ -78,7 +78,18 @@ class LoginView: ILoginView, View {
 
         field
     }
-    val contraseniaField = loginLayout.lookup("#contraseniaField") as JFXPasswordField
+    val contraseniaField by lazy {
+        val field = loginLayout.lookup("#contraseniaField") as JFXPasswordField
+
+        // Obtenemos la imagen del botón de apagado
+        val imagen = Image(javaClass.getResource("../../imagenes/eye.svg").toString(), 25.0, 25.0, false, true)
+
+        //val backgroundSize = BackgroundSize(100.0, 100.0, true, true, true, false)
+        val backgroundImage = BackgroundImage(imagen,BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition(Side.RIGHT, 0.0, false, Side.BOTTOM, 10.0, false), BackgroundSize.DEFAULT)
+        field.background = Background(backgroundImage)
+
+        field
+    }
 
     // Validadores
     val usuarioValidator: RequiredFieldValidator = RequiredFieldValidator()
@@ -118,12 +129,11 @@ class LoginView: ILoginView, View {
 
     private fun establecerValidadores(){
 
-        val svgImage = SvgLoader().loadSvg(javaClass.getResourceAsStream("../../imagenes/error.svg"))
-        svgImage.scaleX = 0.3
-        svgImage.scaleY = 0.3
+        val imagen = Image(javaClass.getResource("../../imagenes/error.svg").toString(), 20.0, 20.0, false, true)
+        val imageView = ImageView(imagen)
 
-        usuarioValidator!!.icon = svgImage
-        contraseniaValidator!!.icon = svgImage
+        usuarioValidator!!.icon = imageView
+        contraseniaValidator!!.icon = imageView
 
         usuarioField.validators.add(usuarioValidator)
         contraseniaField.validators.add(contraseniaValidator)
@@ -137,6 +147,7 @@ class LoginView: ILoginView, View {
         if (usuarioField.validators.find { it == validator } != null) usuarioField.validate()
         else contraseniaField.validate()
     }
+
 
     override fun mostrarDialogCarga(){
         dialogCarga.dialogContainer.isVisible = true

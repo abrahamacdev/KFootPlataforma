@@ -27,6 +27,21 @@ class LoginController(private val loginView: LoginView): ILoginController, Corou
                 // Obtenemos el nombre de usuario y la contrasenia
                 val nombreUsuario = loginView.usuarioField.text
                 val contrasenia = loginView.contraseniaField.characters
+
+                if (nombreUsuario.isEmpty()){
+                    loginView.mostrarValidatorConMensaje(loginView.usuarioValidator,"Campo vacío")
+                    return
+                }
+
+                if (contrasenia.isEmpty()){
+                    loginView.mostrarValidatorConMensaje(loginView.contraseniaValidator,"Campo vacío")
+                    return
+                }
+
+                else {
+
+
+                }
             }
         }
     }

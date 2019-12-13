@@ -13,18 +13,18 @@
 
 <StackPane prefHeight="400.0" prefWidth="500.0" styleClass="fondo-contenedor-login" stylesheets="@../css/estilosPlataforma.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <AnchorPane maxHeight="550.0" maxWidth="550.0" minHeight="550.0" minWidth="550.0" prefHeight="550.0" prefWidth="550.0" styleClass="contenedor-login" StackPane.alignment="CENTER">
+      <AnchorPane maxHeight="575.0" maxWidth="550.0" minHeight="575.0" minWidth="550.0" prefHeight="575.0" prefWidth="550.0" styleClass="contenedor-login" StackPane.alignment="CENTER">
          <children>
-            <Label alignment="CENTER" layoutX="150.0" layoutY="40.0" styleClass="label-titulo-login" text="¡Bienvenido!" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="40.0" />
-            <Label alignment="CENTER" contentDisplay="CENTER" layoutX="100.0" layoutY="120.0" styleClass="label-subtitulo-login" text="Necesitamos que te autentifiques antes de poder continuar" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="120.0" />
+            <Label alignment="CENTER" layoutX="150.0" layoutY="40.0" styleClass="label-titulo-login" text="¡Bienvenido!" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="30.0" />
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutX="100.0" layoutY="120.0" styleClass="label-subtitulo-login" text="Necesitamos que te autentifiques antes de poder continuar" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="100.0" />
             <ImageView fx:id="iconoUsuario" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="120.0" />
-            <JFXTextField id="nombreUsuarioInput" accessibleRole="PASSWORD_FIELD" focusColor="#f44336" labelFloat="true" layoutX="120.0" layoutY="213.0" prefHeight="50.0" prefWidth="260.0" promptText="Correo electrónico" styleClass="inputs-login" unFocusColor="#2196f3" AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="225.0">
+            <JFXTextField id="nombreUsuarioInput" accessibleRole="PASSWORD_FIELD" focusColor="#f44336" labelFloat="true" layoutX="115.0" layoutY="224.0" prefHeight="50.0" prefWidth="260.0" promptText="Correo electrónico" styleClass="inputs-login" unFocusColor="#2196f3" AnchorPane.leftAnchor="115.0" AnchorPane.rightAnchor="125.0" AnchorPane.topAnchor="210.0">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
             </JFXTextField>
             <ImageView fx:id="iconoContrasenia" fitHeight="30.0" fitWidth="30.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="180.0" AnchorPane.leftAnchor="85.0" />
-            <JFXPasswordField id="contraseniaField" focusColor="#f44336" focusTraversable="false" labelFloat="true" layoutX="120.0" layoutY="330.0" prefHeight="50.0" prefWidth="325.0" promptText="Contraseña" styleClass="inputs-login" unFocusColor="#2196f3" AnchorPane.bottomAnchor="155.0" AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="120.0" />
+            <JFXPasswordField id="contraseniaField" focusColor="#f44336" focusTraversable="false" labelFloat="true" layoutX="120.0" layoutY="330.0" prefHeight="50.0" prefWidth="325.0" promptText="Contraseña" styleClass="inputs-login" unFocusColor="#2196f3" AnchorPane.bottomAnchor="175.0" AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="120.0" />
             <JFXButton id="botonLoguearse" alignment="CENTER" buttonType="RAISED" focusTraversable="false" layoutX="175.0" layoutY="320.0" prefHeight="60.0" prefWidth="150.0" ripplerFill="#ba000d" styleClass="boton-loguearse" text="Entrar" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="120.0" />
             <StackPane id="stack" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="500.0" prefHeight="400.0" prefWidth="500.0" visible="false" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="50.0">
                <children>

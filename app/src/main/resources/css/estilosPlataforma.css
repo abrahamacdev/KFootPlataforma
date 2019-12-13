@@ -245,18 +245,19 @@
 }
 
 .label-titulo-login {
-    -fx-font-size: 3.5em 'Cambria';
+    -fx-font-size: 3em 'Cambria';
     -fx-font-weight: bold;
     -fx-text-fill: #eb6b56;
 }
 
 .label-subtitulo-login {
-    -fx-font-size: 1.4em 'Cambria';
+    -fx-font-size: 1.2em 'Cambria';
     -fx-text-fill: #7f7f7f;
 }
 
 .inputs-login {
-    -fx-font-size: 1.5em;
+    -fx-font-size: 1.3em;
+    -fx-prompt-text-size: 1.5em;
 }
 
 .boton-loguearse {

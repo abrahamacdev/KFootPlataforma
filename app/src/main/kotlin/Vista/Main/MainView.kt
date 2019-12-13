@@ -82,7 +82,7 @@ class MainView(): View(), IMainView {
             View.getEscenarioPrincipal()!!.onCloseRequest = mainController.getCerrarClickListener() as EventHandler<WindowEvent>
 
             // Trackeamos la sesión del usuario
-            UserSessionTracker.track()
+            //UserSessionTracker.track()
 
             // Marcamos como pulsado el botón de los plugins
             val botonPlugins = mainLayout.lookup("#botonPlugins") as Button
